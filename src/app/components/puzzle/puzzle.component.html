@@ -1,10 +1,26 @@
 @if (PUZZLE) {
   <div class="puzzle-container">
-    <div class="puzzle" [style.--rows]="PUZZLE.grid.length" [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
+    <div class="puzzle" [style.--rows]="PUZZLE.grid.length"
+         [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
 
-      <div class="puzzle-"></div>
+      <!-- Column Number Hints -->
+      <div class="puzzle-row colHints">
+        @for (colNum of PUZZLE.colNums; let index = $index; track index) {
+          <div class="puzzle-col colHints-col"
+               [ngClass]="{'right-margin': (index + 1) % 5 == 0 && index + 1 !== PUZZLE.colNums.length}">
+            @for (c of colNum; let index = $index; track index) {
+              <div class="colHints-col-num">{{ c }}</div>
+            }
+          </div>
+        }
+      </div>
+
       @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
         <div class="puzzle-row">
+
+<!--          &lt;!&ndash; Row Number Hints &ndash;&gt;-->
+<!--          <div>{{ PUZZLE.rowNums[rowIndex] }}</div>-->
+
           @for (cell of row; let colIndex = $index; track colIndex) {
             <div class="puzzle-col">
               <button class="field" [ngClass]="{
@@ -16,6 +32,7 @@
           }
         </div>
       }
+
     </div>
   </div>
 }

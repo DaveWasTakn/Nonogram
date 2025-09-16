@@ -27,8 +27,6 @@ export class PuzzleComponent {
   start(settings: PuzzleSettings): void {
     console.log(settings);
     this.PUZZLE = this.puzzleService.createPuzzle(settings);
-
-    // this.GRID = puzzle.rows;
   }
 
 }

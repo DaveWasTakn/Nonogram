@@ -5,6 +5,23 @@
   align-items: center;
 }
 
+.colHints {
+  align-items: flex-end;
+
+  .colHints-col {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .colHints-col-num {
+    width: 1.25rem;
+  }
+
+  .right-margin {
+    margin-right: 0.34rem;
+  }
+}
+
 .puzzle-row {
   display: flex;
   margin: 0.03rem;
@@ -19,11 +36,11 @@
   //display: grid;
   //grid-template-columns: repeat(var(--cols), 1.25rem);
   //grid-template-rows: repeat(var(--rows), 1.25rem);
-//  border: 2px solid black;
+  //  border: 2px solid black;
 }
 
 .field {
-  width:1.25rem;
+  width: 1.25rem;
   height: 1.25rem;
   border-radius: 0;
   background-color: AccentColorText;
