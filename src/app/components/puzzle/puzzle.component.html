@@ -18,8 +18,12 @@
       @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
         <div class="puzzle-row">
 
-<!--          &lt;!&ndash; Row Number Hints &ndash;&gt;-->
-<!--          <div>{{ PUZZLE.rowNums[rowIndex] }}</div>-->
+          <!-- Row Number Hints -->
+          <div class="rowHints">
+            @for (num of PUZZLE.rowNums[rowIndex]; let i = $index; track i) {
+              <div class="rowHints-num">{{ num }}</div>
+            }
+          </div>
 
           @for (cell of row; let colIndex = $index; track colIndex) {
             <div class="puzzle-col">

@@ -3,10 +3,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  translate: -7.5rem;
 }
 
 .colHints {
   align-items: flex-end;
+  translate: 15rem;
 
   .colHints-col {
     flex-direction: column;
@@ -19,6 +21,19 @@
 
   .right-margin {
     margin-right: 0.34rem;
+  }
+}
+
+.rowHints {
+  width: 15rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 15rem;
+
+  .rowHints-num {
+    width: 1rem;
+    text-align: center;
   }
 }
 
