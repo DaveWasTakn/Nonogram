@@ -1,0 +1,25 @@
+<mat-toolbar class="toolbar">
+
+  <span>Nonogram</span>
+
+  <mat-form-field appearance="outline" class="select size">
+    <mat-label>Size</mat-label>
+    <mat-select [(ngModel)]="SIZE">
+      @for (size of SIZES; track size) {
+        <mat-option [value]="size">{{ size }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="select difficulty">
+    <mat-label>Difficulty</mat-label>
+    <mat-select [(ngModel)]="DIFFICULTY">
+      @for (difficulty of DIFFICULTIES; track difficulty) {
+        <mat-option [value]="difficulty">{{ difficulty }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button (click)="start()">Start!</button>
+
+</mat-toolbar>
