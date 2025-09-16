@@ -1,9 +1,19 @@
+.title {
+  font-size: 34px;
+  font-weight: bold;
+}
+
 
 .toolbar {
   padding: 40px 20px 40px 20px;
-  justify-content: center;
+}
+
+.settings {
   display: flex;
   align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 
   > * {
     margin: 0 10px;
