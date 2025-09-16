@@ -4,6 +4,7 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
+import {DIFFICULTIES} from '../../shared/shared';
 
 @Component({
   selector: 'app-header',
@@ -19,10 +20,10 @@ import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle
     MatLabel,
     MatButton
   ],
-  templateUrl: './header.html',
-  styleUrl: './header.scss'
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.scss'
 })
-export class Header {
+export class HeaderComponent {
   SIZE = 20;
   SIZES: number[] = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
@@ -38,8 +39,3 @@ export class Header {
 
 }
 
-export enum DIFFICULTIES {
-  EASY = "Easy",
-  MEDIUM = "Medium",
-  HARD = "Hard"
-}

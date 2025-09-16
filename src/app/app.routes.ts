@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import {Puzzle} from './components/puzzle/puzzle';
+import {PuzzleComponent} from './components/puzzle/puzzle.component';
 
 export const routes: Routes = [
-  { path: '', component: Puzzle},
+  { path: '', component: PuzzleComponent},
 ];

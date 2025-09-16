@@ -1,0 +1,21 @@
+@if (PUZZLE) {
+  <div class="puzzle-container">
+    <div class="puzzle" [style.--rows]="PUZZLE.grid.length" [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
+
+      <div class="puzzle-"></div>
+      @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
+        <div class="puzzle-row">
+          @for (cell of row; let colIndex = $index; track colIndex) {
+            <div class="puzzle-col">
+              <button class="field" [ngClass]="{
+                'right-margin': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
+                'bottom-margin': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid[0].length,
+                }">
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

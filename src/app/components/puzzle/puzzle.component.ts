@@ -1,13 +1,19 @@
 import {Component, effect} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
+import {CELL_STATE, Puzzle} from '../../shared/shared';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-puzzle',
-  imports: [],
-  templateUrl: './puzzle.html',
-  styleUrl: './puzzle.scss'
+  imports: [
+    NgClass
+  ],
+  templateUrl: './puzzle.component.html',
+  styleUrl: './puzzle.component.scss'
 })
-export class Puzzle {
+export class PuzzleComponent {
+  // GRID: CELL_STATE[][] = [];
+  PUZZLE: Puzzle | undefined;
 
   constructor(private puzzleService: PuzzleService) {
     effect(() => {
@@ -20,6 +26,9 @@ export class Puzzle {
 
   start(settings: PuzzleSettings): void {
     console.log(settings);
+    this.PUZZLE = this.puzzleService.createPuzzle(settings);
+
+    // this.GRID = puzzle.rows;
   }
 
 }
