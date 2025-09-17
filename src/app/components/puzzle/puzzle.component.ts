@@ -2,6 +2,7 @@ import {Component, effect} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
 import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
+import {ConfettiService} from '../../services/confettiService/confetti-service';
 
 @Component({
   selector: 'app-puzzle',
@@ -19,7 +20,7 @@ export class PuzzleComponent {
   rowIsCompleted: boolean[] = [];
   colIsCompleted: boolean[] = [];
 
-  constructor(private puzzleService: PuzzleService) {
+  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService) {
     effect(() => {
       const settings: PuzzleSettings | undefined = this.puzzleService.puzzleSettingsSignal();
       if (settings) {
@@ -49,6 +50,9 @@ export class PuzzleComponent {
 
   updateSolvedStatus(): void {
     this.SOLVED = this.rowIsCompleted.every(x => x) && this.colIsCompleted.every(x => x)
+    if (this.SOLVED) {
+      this.confettiService.celebrate();
+    }
   }
 
   protected readonly CELL_STATE = CELL_STATE;
