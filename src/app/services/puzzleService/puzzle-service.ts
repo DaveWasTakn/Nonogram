@@ -1,6 +1,6 @@
 import {Injectable, signal} from '@angular/core';
 
-import {CELL_STATE, DIFFICULTIES, DIFFICULTY_PERCENTAGE, Puzzle} from '../../shared/shared';
+import {Cell, CELL_STATE, DIFFICULTIES, DIFFICULTY_PERCENTAGE, Puzzle} from '../../shared/shared';
 
 export interface PuzzleSettings {
   size: number;
@@ -21,8 +21,8 @@ export class PuzzleService {
   createPuzzle(settings: PuzzleSettings): Puzzle {
     const fillChance = DIFFICULTY_PERCENTAGE[settings.difficulty]
 
-    const grid: CELL_STATE[][] = new Array(settings.size).fill(0).map(
-      () => new Array(settings.size).fill(CELL_STATE.EMPTY).map(
+    const grid: Cell[][] = new Array(settings.size).fill(0).map(
+      () => new Array(settings.size).fill(0).map(
         () => this.getCellType(fillChance)
       )
     );
@@ -37,21 +37,26 @@ export class PuzzleService {
     return new Puzzle(settings.size, settings.size, settings.difficulty, grid, cols, rowNums, colNums);
   }
 
-  countBlocks(arr: CELL_STATE[]): number[] {
+  countBlocks(arr: Cell[]): number[] {
     const nums: number[] = [];
     let count = 0;
     for (let elem of arr) {
-      if (elem === CELL_STATE.FILLED) {
+      if (elem.state === CELL_STATE.FILLED) {
         count++;
       } else if (count > 0) { // TODO decide here if user needs to fill all blank boxes with an X
         nums.push(count);
         count = 0;
       }
     }
+
+    if (count > 0) {
+      nums.push(count);
+    }
+
     return nums;
   }
 
-  private getCellType(fillChance: number): CELL_STATE {
-    return Math.random() * 100 < fillChance ? CELL_STATE.FILLED : CELL_STATE.EMPTY;
+  private getCellType(fillChance: number): Cell {
+    return Math.random() * 100 < fillChance ? new Cell(CELL_STATE.FILLED) : new Cell(CELL_STATE.EMPTY);
   }
 }

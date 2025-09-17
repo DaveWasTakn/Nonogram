@@ -25,7 +25,7 @@ import {DIFFICULTIES} from '../../shared/shared';
 })
 export class HeaderComponent {
   SIZE = 20;
-  SIZES: number[] = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+  SIZES: number[] = [5, 10, 15, 20, 25, 30, 40, 50];
 
   DIFFICULTY: DIFFICULTIES = DIFFICULTIES.EASY;
   DIFFICULTIES = Object.values(DIFFICULTIES);

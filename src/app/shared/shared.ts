@@ -1,7 +1,7 @@
 export enum DIFFICULTIES {
-    EASY = "Easy",
-    MEDIUM = "Medium",
-    HARD = "Hard"
+  EASY = "Easy",
+  MEDIUM = "Medium",
+  HARD = "Hard"
 }
 
 export const DIFFICULTY_PERCENTAGE: Record<DIFFICULTIES, number> = {
@@ -11,9 +11,14 @@ export const DIFFICULTY_PERCENTAGE: Record<DIFFICULTIES, number> = {
 };
 
 export enum CELL_STATE {
-  UNKONWN = -1,
-  EMPTY = 0,
-  FILLED = 1,
+  UNKNOWN = 0,
+  EMPTY = 1,
+  FILLED = 2,
+}
+
+export class Cell {  // box CellState into an object to have row- and column- view in sync
+  constructor(public state: CELL_STATE) {
+  }
 }
 
 export class Puzzle {
@@ -21,9 +26,10 @@ export class Puzzle {
     public sizeRows: number,
     public sizeCols: number,
     public difficulty: DIFFICULTIES,
-    public grid: CELL_STATE[][],
-    public grid_columnView: CELL_STATE[][],
+    public grid: Cell[][],
+    public grid_columnView: Cell[][],
     public rowNums: number[][],
     public colNums: number[][]
-  ) {}
+  ) {
+  }
 }

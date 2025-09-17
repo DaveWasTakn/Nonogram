@@ -7,7 +7,10 @@
       <div class="puzzle-row colHints">
         @for (colNum of PUZZLE.colNums; let index = $index; track index) {
           <div class="puzzle-col colHints-col"
-               [ngClass]="{'right-margin': (index + 1) % 5 == 0 && index + 1 !== PUZZLE.colNums.length}">
+               [ngClass]="{
+                 'right-margin': (index + 1) % 5 == 0 && index + 1 !== PUZZLE.colNums.length,
+                 'completed-hint': colIsCompleted[index]
+               }">
             @for (c of colNum; let index = $index; track index) {
               <div class="colHints-col-num">{{ c }}</div>
             }
@@ -19,18 +22,22 @@
         <div class="puzzle-row">
 
           <!-- Row Number Hints -->
-          <div class="rowHints">
-            @for (num of PUZZLE.rowNums[rowIndex]; let i = $index; track i) {
-              <div class="rowHints-num">{{ num }}</div>
-            }
+          <div class="rowHints-container">
+            <div class="rowHints" [ngClass]="{'completed-hint': rowIsCompleted[rowIndex]}">
+              @for (num of PUZZLE.rowNums[rowIndex]; let i = $index; track i) {
+                <div class="rowHints-num">{{ num }}</div>
+              }
+            </div>
           </div>
 
           @for (cell of row; let colIndex = $index; track colIndex) {
             <div class="puzzle-col">
               <button class="field" [ngClass]="{
-                'right-margin': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
-                'bottom-margin': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid[0].length,
-                }">
+                  'right-margin': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
+                  'bottom-margin': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid[0].length,
+                  'filled-field': GRID[rowIndex][colIndex].state === CELL_STATE.FILLED
+                }" (click)="onClick(rowIndex, colIndex)" (auxclick)="onAuxClick(rowIndex, colIndex)">
+                {{ GRID[rowIndex][colIndex].state === CELL_STATE.EMPTY ? "X" : "" }}
               </button>
             </div>
           }

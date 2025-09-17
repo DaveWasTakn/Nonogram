@@ -24,12 +24,17 @@
   }
 }
 
-.rowHints {
+.rowHints-container {
   width: 15rem;
+  min-width: 15rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rowHints {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  min-width: 15rem;
 
   .rowHints-num {
     width: 1rem;
@@ -67,4 +72,12 @@
   &.bottom-margin {
     margin-bottom: 0.3rem;
   }
+}
+
+.filled-field {
+  background-color: black;
+}
+
+.completed-hint {
+  background-color: aquamarine;
 }
