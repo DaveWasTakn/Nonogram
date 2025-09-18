@@ -13,7 +13,7 @@
   justify-content: center;
   align-items: start;
   margin-top: 2rem;
-  --cell-size: 1.25rem;
+  --cell-size: min(3rem, min(calc(50vh / var(--rows)), calc(50vw / var(--cols))));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: calc(0.8 * var(--cell-size));
     border: 1px solid transparent;
   }
 }
@@ -63,6 +63,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: calc(0.8 * var(--cell-size));
     border: 1px solid transparent;
   }
 }
@@ -80,8 +81,10 @@
   width: var(--cell-size);
   height: var(--cell-size);
   border: 1px solid black;
-  text-align: center;
-  font-size: var(--cell-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(0.5 * var(--cell-size));
   background-color: AccentColorText;
   user-select: none;
 
