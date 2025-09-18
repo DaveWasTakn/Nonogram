@@ -1,4 +1,4 @@
-import {Component, effect, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {Component, effect, HostListener} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
 import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
@@ -122,8 +122,12 @@ export class PuzzleComponent {
 
   private updateCellSize() {
     let verticalItems = this.PUZZLE!.sizeRows + Math.max(...this.PUZZLE!.colNums.map(x => x.length));
-    let cellSize = (window.innerHeight - 120 - 2 * verticalItems) / verticalItems
-    cellSize = Math.min(cellSize, 50);
+    const verticalCellSize = (window.innerHeight - 120 - 2 * verticalItems) / verticalItems;
+
+    const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
+    const horizontalCellSize = (window.innerWidth - 100 - 2 * horizontalItems) / horizontalItems;
+
+    const cellSize = Math.min(verticalCellSize, horizontalCellSize, 50);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
   }
 }
