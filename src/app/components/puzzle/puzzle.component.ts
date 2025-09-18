@@ -56,9 +56,15 @@ export class PuzzleComponent {
     event.preventDefault();
   }
 
+  @HostListener('window:resize')
+  onResize() {
+    this.updateCellSize();
+  }
+
   start(settings: PuzzleSettings): void {
     console.log(settings);
     this.PUZZLE = this.puzzleService.createPuzzle(settings);
+    this.updateCellSize()
     this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
     this.rowIsCompleted = new Array(this.PUZZLE.sizeRows).fill(false);
@@ -112,5 +118,12 @@ export class PuzzleComponent {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;
     }
     this.onCellUpdate(row, col);
+  }
+
+  private updateCellSize() {
+    let verticalItems = this.PUZZLE!.sizeRows + Math.max(...this.PUZZLE!.colNums.map(x => x.length));
+    let cellSize = (window.innerHeight - 120 - 2 * verticalItems) / verticalItems
+    cellSize = Math.min(cellSize, 50);
+    document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
   }
 }
