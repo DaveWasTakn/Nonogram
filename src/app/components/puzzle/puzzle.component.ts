@@ -127,7 +127,7 @@ export class PuzzleComponent {
     const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
     const horizontalCellSize = (window.innerWidth - 100 - 2 * horizontalItems) / horizontalItems;
 
-    const cellSize = Math.min(verticalCellSize, horizontalCellSize, 50);
+    const cellSize = Math.min(verticalCellSize, horizontalCellSize, 30);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
   }
 }
