@@ -1,4 +1,4 @@
-import {Component, effect, HostListener} from '@angular/core';
+import {Component, effect, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
 import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
@@ -106,7 +106,7 @@ export class PuzzleComponent {
   onMouseOver(row: number, col: number, event: MouseEvent) {
     if (this.MB_left) {
       this.GRID[row][col].state = CELL_STATE.FILLED;
-    } else if (this.MB_right) {
+    } else if (this.MB_right && this.GRID[row][col].state !== CELL_STATE.FILLED) {
       this.GRID[row][col].state = CELL_STATE.EMPTY;
     } else if (this.MB_middle) {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;

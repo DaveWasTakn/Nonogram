@@ -92,17 +92,24 @@
 
 
 .right-sep {
-  border-right: 2px solid black;
+  border-right: 2px solid AccentColor;
 }
 
 .bottom-sep {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid AccentColor;
 }
 
 .bottom-sep-row-hints .hint-num:nth-child(n) {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid AccentColor;
 }
 
 .completed-hint {
   background-color: aquamarine;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+.prevent-select {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

@@ -11,7 +11,7 @@
         <div class="hint-col"
              [ngClass]="{'completed-hint': colIsCompleted[colIndex],'right-sep': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length}">
           @for (num of colNum; let i = $index; track i) {
-            <div class="hint-num">{{ num }}</div>
+            <div class="hint-num prevent-select">{{ num }}</div>
           }
         </div>
       }
@@ -23,7 +23,7 @@
         <div class="hint-row"
              [ngClass]="{'completed-hint': rowIsCompleted[rowIndex], 'bottom-sep-row-hints': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length}">
           @for (num of rowNums; let i = $index; track i) {
-            <div class="hint-num">{{ num }}</div>
+            <div class="hint-num prevent-select">{{ num }}</div>
           }
         </div>
       }
@@ -33,7 +33,7 @@
     <div class="puzzle-grid">
       @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
         @for (cell of row; let colIndex = $index; track colIndex) {
-          <div class="cell"
+          <div class="cell prevent-select"
                [ngClass]="{
                  'right-sep': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
                  'bottom-sep': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length,
