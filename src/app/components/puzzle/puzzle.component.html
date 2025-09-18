@@ -5,10 +5,11 @@
        [style.--rows]="PUZZLE.grid.length"
        [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
 
-<!--     Column Hints -->
+    <!-- Column Hints -->
     <div class="col-hints">
       @for (colNum of PUZZLE.colNums; let colIndex = $index; track colIndex) {
-        <div class="hint-col" [ngClass]="{'completed-hint': colIsCompleted[colIndex]}">
+        <div class="hint-col"
+             [ngClass]="{'completed-hint': colIsCompleted[colIndex],'right-sep': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length}">
           @for (num of colNum; let i = $index; track i) {
             <div class="hint-num">{{ num }}</div>
           }
@@ -16,10 +17,11 @@
       }
     </div>
 
-<!--     Row Hints -->
+    <!-- Row Hints -->
     <div class="row-hints">
       @for (rowNums of PUZZLE.rowNums; let rowIndex = $index; track rowIndex) {
-        <div class="hint-row" [ngClass]="{'completed-hint': rowIsCompleted[rowIndex]}">
+        <div class="hint-row"
+             [ngClass]="{'completed-hint': rowIsCompleted[rowIndex], 'bottom-sep-row-hints': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length}">
           @for (num of rowNums; let i = $index; track i) {
             <div class="hint-num">{{ num }}</div>
           }
@@ -27,7 +29,7 @@
       }
     </div>
 
-<!--     Puzzle Grid -->
+    <!-- Puzzle Grid -->
     <div class="puzzle-grid">
       @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
         @for (cell of row; let colIndex = $index; track colIndex) {
