@@ -29,7 +29,8 @@ export class Puzzle {
     public grid: Cell[][],
     public grid_columnView: Cell[][],
     public rowNums: number[][],
-    public colNums: number[][]
+    public colNums: number[][],
+    public totalFilledCells: number
   ) {
   }
 }

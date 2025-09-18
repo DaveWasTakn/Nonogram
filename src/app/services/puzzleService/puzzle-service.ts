@@ -34,7 +34,11 @@ export class PuzzleService {
     console.log(rowNums);
     console.log(colNums);
     console.log(grid);
-    return new Puzzle(settings.size, settings.size, settings.difficulty, grid, cols, rowNums, colNums);
+    return new Puzzle(settings.size, settings.size, settings.difficulty, grid, cols, rowNums, colNums, PuzzleService.countFilledFields(grid));
+  }
+
+  static countFilledFields(grid: Cell[][]): number {
+    return grid.flat().filter(cell => cell.state === CELL_STATE.FILLED).length;
   }
 
   countBlocks(arr: Cell[]): number[] {

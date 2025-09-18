@@ -3,11 +3,13 @@ import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle
 import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
 import {ConfettiService} from '../../services/confettiService/confetti-service';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-puzzle',
   imports: [
-    NgClass
+    NgClass,
+    MatProgressBar
   ],
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.scss'
@@ -16,9 +18,11 @@ export class PuzzleComponent {
   GRID: Cell[][] = [];
   GRID_COLUMNS: Cell[][] = [];
   SOLVED: boolean = false;
+  PROGRESS: number = 0;
   PUZZLE: Puzzle | undefined;
   rowIsCompleted: boolean[] = [];
   colIsCompleted: boolean[] = [];
+  protected readonly CELL_STATE = CELL_STATE;
 
   constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService) {
     effect(() => {
@@ -36,6 +40,7 @@ export class PuzzleComponent {
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
     this.rowIsCompleted = new Array(this.PUZZLE.sizeRows).fill(false);
     this.colIsCompleted = new Array(this.PUZZLE.sizeCols).fill(false);
+    this.PROGRESS = 0;
   }
 
   onCellUpdate(row: number, col: number): void {
@@ -43,9 +48,10 @@ export class PuzzleComponent {
     const currBlocks_cols: number[] = this.puzzleService.countBlocks(this.GRID_COLUMNS[col]);
 
     this.rowIsCompleted[row] = this.PUZZLE!.rowNums[row].toString() === currBlocks_rows.toString();
-    this.colIsCompleted[col] = this.PUZZLE!.colNums[col].toString() == currBlocks_cols.toString();
+    this.colIsCompleted[col] = this.PUZZLE!.colNums[col].toString() === currBlocks_cols.toString();
 
     this.updateSolvedStatus();
+    this.updateProgress();
   }
 
   updateSolvedStatus(): void {
@@ -55,7 +61,9 @@ export class PuzzleComponent {
     }
   }
 
-  protected readonly CELL_STATE = CELL_STATE;
+  updateProgress(): void {
+    this.PROGRESS = Math.round((PuzzleService.countFilledFields(this.GRID) / this.PUZZLE!.totalFilledCells) * 100);
+  }
 
   onClick(row: number, col: number) {
     this.GRID[row][col].state = (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2);
@@ -66,4 +74,5 @@ export class PuzzleComponent {
   onAuxClick(row: number, col: number) {
 
   }
+
 }

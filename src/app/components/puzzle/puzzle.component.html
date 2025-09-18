@@ -1,4 +1,6 @@
 @if (PUZZLE) {
+  <mat-progress-bar class="progress-bar" mode="determinate" [value]="PROGRESS"></mat-progress-bar>
+
   <div class="puzzle-container">
     <div class="puzzle" [style.--rows]="PUZZLE.grid.length"
          [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
@@ -12,7 +14,7 @@
                  'completed-hint': colIsCompleted[index]
                }">
             @for (c of colNum; let index = $index; track index) {
-              <div class="colHints-col-num">{{ c }}</div>
+              <div class="colHints-col-num no-selection">{{ c }}</div>
             }
           </div>
         }
@@ -25,7 +27,7 @@
           <div class="rowHints-container">
             <div class="rowHints" [ngClass]="{'completed-hint': rowIsCompleted[rowIndex]}">
               @for (num of PUZZLE.rowNums[rowIndex]; let i = $index; track i) {
-                <div class="rowHints-num">{{ num }}</div>
+                <div class="rowHints-num no-selection">{{ num }}</div>
               }
             </div>
           </div>
@@ -43,7 +45,6 @@
           }
         </div>
       }
-
     </div>
   </div>
 }
