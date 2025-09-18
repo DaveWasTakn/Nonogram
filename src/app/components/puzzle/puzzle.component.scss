@@ -1,84 +1,99 @@
+.puzzle-container,
+.puzzle-container * {
+  box-sizing: border-box;
+}
+
 .puzzle-container {
-  margin-top: 2rem;
-  display: flex;
+  display: grid;
+  grid-template-areas:
+    ". col-hints"
+    "row-hints puzzle";
+  grid-template-columns: auto repeat(var(--cols), var(--cell-size));
+  grid-template-rows: auto repeat(var(--rows), var(--cell-size));
   justify-content: center;
-  align-items: center;
-  translate: -7.5rem;
+  align-items: start;
+  margin-top: 2rem;
+  --cell-size: 1.25rem;
 }
 
-.colHints {
-  align-items: flex-end;
-  translate: 15rem;
-  width: 1.25rem;
+//////////////////////////////////////////////////////////////////////////////////////////
+.col-hints {
+  grid-area: col-hints;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell-size));
+  justify-items: stretch;
+  align-items: end;
 
-  .colHints-col {
+  .hint-col {
+    display: flex;
     flex-direction: column;
-    text-align: center;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
   }
 
-  .colHints-col-num {
-    width: 1.25rem;
-  }
-
-  .right-margin {
-    margin-right: 0.34rem;
+  .hint-num {
+    width: 100%;
+    height: var(--cell-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
   }
 }
 
-.rowHints-container {
-  width: 15rem;
-  min-width: 15rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.rowHints {
-  display: flex;
-  justify-content: flex-end;
+//////////////////////////////////////////////////////////////////////////////////////////
+.row-hints {
+  grid-area: row-hints;
+  display: grid;
+  grid-template-rows: repeat(var(--rows), var(--cell-size));
+  justify-items: end;
   align-items: center;
 
-  .rowHints-num {
-    width: 1rem;
-    text-align: center;
+  .hint-row {
+    display: flex;
+  }
+
+  .hint-num {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
   }
 }
 
-.puzzle-row {
-  display: flex;
-  margin: 0.03rem;
+//////////////////////////////////////////////////////////////////////////////////////////
+.puzzle-grid {
+  grid-area: puzzle;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell-size));
+  grid-template-rows: repeat(var(--rows), var(--cell-size));
 }
 
-.puzzle-col {
-  display: flex;
-  margin: 0.05rem;
-}
-
-.puzzle {
-}
-
-.no-selection {
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.field {
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 0;
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: 1px solid black;
+  text-align: center;
+  font-size: var(--cell-size);
   background-color: AccentColorText;
+  user-select: none;
 
-  &.right-margin {
-    margin-right: 0.3rem;
-  }
-
-  &.bottom-margin {
-    margin-bottom: 0.3rem;
+  &.filled-field {
+    background-color: black;
   }
 }
 
-.filled-field {
-  background-color: black;
+
+.right-sep {
+  border-right: 2px solid black;
+}
+
+.bottom-sep {
+  border-bottom: 2px solid black;
 }
 
 .completed-hint {

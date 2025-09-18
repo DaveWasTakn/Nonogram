@@ -1,53 +1,48 @@
 @if (PUZZLE) {
   <mat-progress-bar class="progress-bar" mode="determinate" [value]="PROGRESS"></mat-progress-bar>
 
-  <div class="puzzle-container">
-    <div class="puzzle" [style.--rows]="PUZZLE.grid.length"
-         [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
+  <div class="puzzle-container"
+       [style.--rows]="PUZZLE.grid.length"
+       [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
 
-      <!-- Column Number Hints -->
-      <div class="puzzle-row colHints">
-        @for (colNum of PUZZLE.colNums; let index = $index; track index) {
-          <div class="puzzle-col colHints-col"
-               [ngClass]="{
-                 'right-margin': (index + 1) % 5 == 0 && index + 1 !== PUZZLE.colNums.length,
-                 'completed-hint': colIsCompleted[index]
-               }">
-            @for (c of colNum; let index = $index; track index) {
-              <div class="colHints-col-num no-selection">{{ c }}</div>
-            }
-          </div>
-        }
-      </div>
-
-      @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
-        <div class="puzzle-row">
-
-          <!-- Row Number Hints -->
-          <div class="rowHints-container">
-            <div class="rowHints" [ngClass]="{'completed-hint': rowIsCompleted[rowIndex]}">
-              @for (num of PUZZLE.rowNums[rowIndex]; let i = $index; track i) {
-                <div class="rowHints-num no-selection">{{ num }}</div>
-              }
-            </div>
-          </div>
-
-          @for (cell of row; let colIndex = $index; track colIndex) {
-            <div class="puzzle-col">
-              <div class="field no-selection" [ngClass]="{
-                'right-margin': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
-                'bottom-margin': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid[0].length,
-                'filled-field': GRID[rowIndex][colIndex].state === CELL_STATE.FILLED
-              }"
-                      (click)="onClick(rowIndex, colIndex, $event)"
-                      (auxclick)="onAuxClick(rowIndex, colIndex, $event)"
-                      (mousemove)="onMouseOver(rowIndex, colIndex, $event)"
-              >
-                {{ GRID[rowIndex][colIndex].state === CELL_STATE.EMPTY ? "X" : "" }}
-              </div>
-            </div>
+<!--     Column Hints -->
+    <div class="col-hints">
+      @for (colNum of PUZZLE.colNums; let colIndex = $index; track colIndex) {
+        <div class="hint-col" [ngClass]="{'completed-hint': colIsCompleted[colIndex]}">
+          @for (num of colNum; let i = $index; track i) {
+            <div class="hint-num">{{ num }}</div>
           }
         </div>
+      }
+    </div>
+
+<!--     Row Hints -->
+    <div class="row-hints">
+      @for (rowNums of PUZZLE.rowNums; let rowIndex = $index; track rowIndex) {
+        <div class="hint-row" [ngClass]="{'completed-hint': rowIsCompleted[rowIndex]}">
+          @for (num of rowNums; let i = $index; track i) {
+            <div class="hint-num">{{ num }}</div>
+          }
+        </div>
+      }
+    </div>
+
+<!--     Puzzle Grid -->
+    <div class="puzzle-grid">
+      @for (row of PUZZLE.grid; let rowIndex = $index; track rowIndex) {
+        @for (cell of row; let colIndex = $index; track colIndex) {
+          <div class="cell"
+               [ngClass]="{
+                 'right-sep': (colIndex + 1) % 5 == 0 && colIndex + 1 !== PUZZLE.grid.length,
+                 'bottom-sep': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length,
+                 'filled-field': GRID[rowIndex][colIndex].state === CELL_STATE.FILLED
+               }"
+               (click)="onClick(rowIndex, colIndex, $event)"
+               (auxclick)="onAuxClick(rowIndex, colIndex, $event)"
+               (mousemove)="onMouseOver(rowIndex, colIndex, $event)">
+            {{ GRID[rowIndex][colIndex].state === CELL_STATE.EMPTY ? "X" : "" }}
+          </div>
+        }
       }
     </div>
   </div>
