@@ -1,4 +1,5 @@
 # Nonogram
+An Angular application that lets you play and solve Nonogram (Picross) puzzles.
 
 Hosted at: https://nonogram.pfliegler.at/
 
