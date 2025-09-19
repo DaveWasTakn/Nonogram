@@ -26,12 +26,14 @@ export class PuzzleService {
         () => this.getCellType(fillChance)
       )
     );
+    const cols = grid[0].map((_, i) => grid.map(row => row[i]));
 
-    // TODO ensure at least one block per row and col
+    grid.forEach(this.ensureAtLeastOneFilled);
+    cols.forEach(this.ensureAtLeastOneFilled);
+
     // TODO check solvability ...
 
     const rowNums = grid.map(this.countBlocks);
-    let cols = grid[0].map((_, i) => grid.map(row => row[i]));
     const colNums = cols.map(this.countBlocks);
 
     console.log(rowNums);
@@ -44,13 +46,22 @@ export class PuzzleService {
     return grid.flat().filter(cell => cell.state === CELL_STATE.FILLED).length;
   }
 
+  ensureAtLeastOneFilled(arr: Cell[]): void {
+    if (!arr.some(cell => cell.state === CELL_STATE.FILLED)) {
+      const randomIndex = Math.floor(Math.random() * arr.length);
+      arr[randomIndex] = new Cell(CELL_STATE.FILLED);
+      console.log("set random cell to filled")
+    }
+  }
+
+
   countBlocks(arr: Cell[]): number[] {
     const nums: number[] = [];
     let count = 0;
     for (let elem of arr) {
       if (elem.state === CELL_STATE.FILLED) {
         count++;
-      } else if (count > 0) { // TODO decide here if user needs to fill all blank boxes with an X
+      } else if (count > 0) {
         nums.push(count);
         count = 0;
       }
