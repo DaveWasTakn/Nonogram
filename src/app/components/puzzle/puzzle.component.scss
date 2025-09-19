@@ -85,7 +85,7 @@
   justify-content: center;
   align-items: center;
   font-size: calc(0.5 * var(--cell-size));
-  background-color: AccentColorText;
+  background-color: var(--mat-sys-surface);
   user-select: none;
 
   &.filled-field {
@@ -94,15 +94,15 @@
 }
 
 .right-sep {
-  border-right: 2px solid AccentColor;
+  border-right: 2px solid var(--mat-sys-primary);
 }
 
 .bottom-sep {
-  border-bottom: 2px solid AccentColor;
+  border-bottom: 2px solid var(--mat-sys-primary);
 }
 
 .bottom-sep-row-hints .hint-num:nth-child(n) {
-  border-bottom: 2px solid AccentColor;
+  border-bottom: 2px solid var(--mat-sys-primary);
 }
 
 .completed-hint {
