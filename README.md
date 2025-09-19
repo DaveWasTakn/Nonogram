@@ -8,7 +8,7 @@ Hosted at: https://nonogram.pfliegler.at/
 - Confirmation dialogue when starting a new game if the current game is edited
 - Save state in local storage
   - Resume game from local storage
-- Allow share button and url-encode state
+- Share button and url-encode state
   - Resume game from url-encoded parameter
 - Smarter puzzle creation algorithm
   - Check solvability
