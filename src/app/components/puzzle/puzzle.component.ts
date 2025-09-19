@@ -123,22 +123,17 @@ export class PuzzleComponent {
         this.onCellUpdate(row, col);
       }
     }
-
   }
 
   onMouseOverCell(row: number, col: number, event: MouseEvent) {
     if (this.MB_left) {
       this.currentMouseOverCells.push([row, col]);
-      if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
-        this.GRID[row][col].state = CELL_STATE.FILLED;
-        this.onCellUpdate(row, col);
-      }
+      this.GRID[row][col].state = CELL_STATE.FILLED;
+      this.onCellUpdate(row, col);
     } else if (this.MB_right) {
       this.currentMouseOverCells.push([row, col]);
-      if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
-        this.GRID[row][col].state = CELL_STATE.EMPTY;
-        this.onCellUpdate(row, col);
-      }
+      this.GRID[row][col].state = CELL_STATE.EMPTY;
+      this.onCellUpdate(row, col);
     } else if (this.MB_middle) {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;
       this.onCellUpdate(row, col);
