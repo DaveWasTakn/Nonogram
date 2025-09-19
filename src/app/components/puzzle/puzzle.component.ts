@@ -63,7 +63,9 @@ export class PuzzleComponent {
 
   @HostListener('window:resize')
   onResize() {
-    this.updateCellSize();
+    if (this.PUZZLE) {
+      this.updateCellSize();
+    }
   }
 
   start(settings: PuzzleSettings): void {
