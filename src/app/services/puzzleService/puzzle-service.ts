@@ -27,6 +27,9 @@ export class PuzzleService {
       )
     );
 
+    // TODO ensure at least one block per row and col
+    // TODO check solvability ...
+
     const rowNums = grid.map(this.countBlocks);
     let cols = grid[0].map((_, i) => grid.map(row => row[i]));
     const colNums = cols.map(this.countBlocks);
