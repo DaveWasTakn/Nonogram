@@ -22,7 +22,10 @@ export class PuzzleComponent {
   PUZZLE: Puzzle | undefined;
   rowIsCompleted: boolean[] = [];
   colIsCompleted: boolean[] = [];
+
   protected readonly CELL_STATE = CELL_STATE;
+  private currentMouseDownCell: number[] | undefined = undefined;
+  private currentMouseOverCells: number[][] = [];
 
   constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService) {
     effect(() => {
@@ -49,6 +52,8 @@ export class PuzzleComponent {
     if (event.button === 0) this.MB_left = false;
     if (event.button === 1) this.MB_middle = false;
     if (event.button === 2) this.MB_right = false;
+    this.currentMouseDownCell = undefined;
+    this.currentMouseOverCells = [];
   }
 
   @HostListener('document:contextmenu', ['$event'])
@@ -95,27 +100,33 @@ export class PuzzleComponent {
     this.PROGRESS = Math.round((PuzzleService.countFilledFields(this.GRID) / this.PUZZLE!.totalFilledCells) * 100);
   }
 
-  onClick(row: number, col: number, event: MouseEvent) {
-    this.GRID[row][col].state = CELL_STATE.FILLED;
-    this.onCellUpdate(row, col);
+  onMouseDownCell(row: number, col: number, event: MouseEvent) {
+    this.currentMouseDownCell = [row, col];
   }
 
-  onAuxClick(row: number, col: number, event: MouseEvent) {
-    if (event.button === 2) {
-      this.GRID[row][col].state = CELL_STATE.EMPTY;
-    } else {
-      this.GRID[row][col].state = CELL_STATE.UNKNOWN;
+  onMouseUpCell(row: number, col: number, event: MouseEvent) {
+    if (
+      this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col
+      && (this.currentMouseOverCells.length === 0 || !(this.currentMouseOverCells[0][0] === row && this.currentMouseOverCells[0][1] === col))
+    ) {
+      this.GRID[row][col].state = (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2);
     }
-    this.onCellUpdate(row, col);
   }
 
-  onMouseOver(row: number, col: number, event: MouseEvent) {
+  onMouseOverCell(row: number, col: number, event: MouseEvent) {
     if (this.MB_left) {
-      this.GRID[row][col].state = CELL_STATE.FILLED;
-    } else if (this.MB_right && this.GRID[row][col].state !== CELL_STATE.FILLED) {
-      this.GRID[row][col].state = CELL_STATE.EMPTY;
+      this.currentMouseOverCells.push([row, col]);
+      if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
+        this.GRID[row][col].state = CELL_STATE.FILLED;
+      }
+    } else if (this.MB_right) {
+      this.currentMouseOverCells.push([row, col]);
+      if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
+        this.GRID[row][col].state = CELL_STATE.EMPTY;
+      }
     } else if (this.MB_middle) {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;
+      this.currentMouseOverCells.push([row, col]);
     }
     this.onCellUpdate(row, col);
   }

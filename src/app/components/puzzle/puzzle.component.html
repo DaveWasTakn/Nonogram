@@ -39,9 +39,9 @@
                  'bottom-sep': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length,
                  'filled-field': GRID[rowIndex][colIndex].state === CELL_STATE.FILLED
                }"
-               (click)="onClick(rowIndex, colIndex, $event)"
-               (auxclick)="onAuxClick(rowIndex, colIndex, $event)"
-               (mousemove)="onMouseOver(rowIndex, colIndex, $event)">
+               (mousedown)="onMouseDownCell(rowIndex, colIndex, $event)"
+               (mouseup)="onMouseUpCell(rowIndex, colIndex, $event)"
+               (mousemove)="onMouseOverCell(rowIndex, colIndex, $event)">
             {{ GRID[rowIndex][colIndex].state === CELL_STATE.EMPTY ? "X" : "" }}
           </div>
         }
