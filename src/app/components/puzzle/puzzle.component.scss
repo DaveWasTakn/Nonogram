@@ -1,6 +1,7 @@
 .puzzle-container,
 .puzzle-container * {
   box-sizing: border-box;
+  touch-action: none;
 }
 
 .puzzle-container {
