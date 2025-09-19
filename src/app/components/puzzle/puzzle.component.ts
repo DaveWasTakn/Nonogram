@@ -106,11 +106,24 @@ export class PuzzleComponent {
 
   onMouseUpCell(row: number, col: number, event: MouseEvent) {
     if (
-      this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col
+      event.button === 0
+      && this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col
       && (this.currentMouseOverCells.length === 0 || !(this.currentMouseOverCells[0][0] === row && this.currentMouseOverCells[0][1] === col))
     ) {
       this.GRID[row][col].state = (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2);
+      this.onCellUpdate(row, col);
     }
+
+    if (this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col && this.currentMouseOverCells.length <= 1) {
+      if (event.button === 2) {
+        this.GRID[row][col].state = CELL_STATE.EMPTY;
+        this.onCellUpdate(row, col);
+      } else if (event.button === 1) {
+        this.GRID[row][col].state = CELL_STATE.UNKNOWN;
+        this.onCellUpdate(row, col);
+      }
+    }
+
   }
 
   onMouseOverCell(row: number, col: number, event: MouseEvent) {
@@ -118,17 +131,19 @@ export class PuzzleComponent {
       this.currentMouseOverCells.push([row, col]);
       if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
         this.GRID[row][col].state = CELL_STATE.FILLED;
+        this.onCellUpdate(row, col);
       }
     } else if (this.MB_right) {
       this.currentMouseOverCells.push([row, col]);
       if (this.GRID[row][col].state === CELL_STATE.UNKNOWN) {
         this.GRID[row][col].state = CELL_STATE.EMPTY;
+        this.onCellUpdate(row, col);
       }
     } else if (this.MB_middle) {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;
+      this.onCellUpdate(row, col);
       this.currentMouseOverCells.push([row, col]);
     }
-    this.onCellUpdate(row, col);
   }
 
   private updateCellSize() {
