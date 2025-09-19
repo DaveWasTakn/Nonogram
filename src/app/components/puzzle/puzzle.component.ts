@@ -67,7 +67,6 @@ export class PuzzleComponent {
   }
 
   start(settings: PuzzleSettings): void {
-    console.log(settings);
     this.PUZZLE = this.puzzleService.createPuzzle(settings);
     this.updateCellSize()
     this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));

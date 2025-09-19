@@ -36,9 +36,6 @@ export class PuzzleService {
     const rowNums = grid.map(this.countBlocks);
     const colNums = cols.map(this.countBlocks);
 
-    console.log(rowNums);
-    console.log(colNums);
-    console.log(grid);
     return new Puzzle(settings.size, settings.size, settings.difficulty, grid, cols, rowNums, colNums, PuzzleService.countFilledFields(grid));
   }
 
@@ -50,7 +47,6 @@ export class PuzzleService {
     if (!arr.some(cell => cell.state === CELL_STATE.FILLED)) {
       const randomIndex = Math.floor(Math.random() * arr.length);
       arr[randomIndex] = new Cell(CELL_STATE.FILLED);
-      console.log("set random cell to filled")
     }
   }
 
