@@ -105,11 +105,12 @@
   border-bottom: 2px solid var(--mat-sys-primary);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
 .completed-hint {
-  background-color: aquamarine;
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
 .prevent-select {
   -webkit-user-select: none;
   -ms-user-select: none;
