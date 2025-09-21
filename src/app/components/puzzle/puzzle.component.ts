@@ -5,12 +5,16 @@ import {NgClass} from '@angular/common';
 import {ConfettiService} from '../../services/confettiService/confetti-service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {BreakpointObserver} from '@angular/cdk/layout';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-puzzle',
   imports: [
     NgClass,
-    MatProgressBar
+    MatProgressBar,
+    MatButtonToggleModule,
+    FormsModule
   ],
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.scss'
@@ -23,6 +27,7 @@ export class PuzzleComponent {
   PUZZLE: Puzzle | undefined;
   rowIsCompleted: boolean[] = [];
   colIsCompleted: boolean[] = [];
+  TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
 
   protected readonly CELL_STATE = CELL_STATE;
   private currentMouseDownCell: number[] | undefined = undefined;
@@ -157,7 +162,7 @@ export class PuzzleComponent {
       const row: string | null = target.getAttribute('data-row');
       const col: string | null = target.getAttribute('data-col');
       if (row !== null && col !== null) {
-        this.GRID[+row][+col].state = CELL_STATE.FILLED;
+      this.GRID[+row][+col].state = this.TOUCH_MODE;
         this.onCellUpdate(+row, +col);
       }
     }

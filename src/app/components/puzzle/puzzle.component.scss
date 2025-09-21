@@ -117,6 +117,10 @@
   border-bottom: 2px solid var(--mat-sys-primary);
 }
 
+.touch-mode-toggle {
+  display: none;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 .completed-hint {
   background-color: var(--mat-sys-primary-container);
@@ -128,6 +132,12 @@
 }
 
 @media (max-width: 600px) {
+
+  .touch-mode-toggle {
+    display: inline-flex;
+    width: fit-content;
+    align-self: center;
+  }
 
   .puzzle-grid, .row-hints, .col-hints {
     gap: unset;
