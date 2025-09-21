@@ -5,6 +5,7 @@ import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
 import {DIFFICULTIES} from '../../shared/shared';
+import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-header',
@@ -24,13 +25,17 @@ import {DIFFICULTIES} from '../../shared/shared';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  SIZE = 20;
-  SIZES: number[] = [5, 10, 15, 20, 25, 30, 40, 50];
+  SIZE = 15;
+  SIZES: number[] = [5, 10, 15, 20, 25, 30, 40];
 
   DIFFICULTY: DIFFICULTIES = DIFFICULTIES.EASY;
   DIFFICULTIES = Object.values(DIFFICULTIES);
+  IS_MOBILE: boolean = false;
 
-  constructor(private puzzleService: PuzzleService) {
+  constructor(private puzzleService: PuzzleService, private breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
+      this.IS_MOBILE = result.matches;
+    });
   }
 
   start(): void {

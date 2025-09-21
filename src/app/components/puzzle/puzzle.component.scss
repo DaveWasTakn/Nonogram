@@ -1,3 +1,14 @@
+.puzzle-wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.puzzle-wrapper { background: rgba(0,255,0,0.08); }
+.puzzle-container { background: rgba(0,0,255,0.03); }
+
 .puzzle-container,
 .puzzle-container * {
   box-sizing: border-box;
@@ -9,12 +20,9 @@
   grid-template-areas:
     ". col-hints"
     "row-hints puzzle";
-  grid-template-columns: auto repeat(var(--cols), var(--cell-size));
-  grid-template-rows: auto repeat(var(--rows), var(--cell-size));
   justify-content: center;
   align-items: start;
   margin-top: 1rem;
-  translate: -50px;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -116,4 +124,7 @@
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+@media (max-width: 600px) {
 }

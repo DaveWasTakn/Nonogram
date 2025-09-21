@@ -1,6 +1,7 @@
 @if (PUZZLE) {
   <mat-progress-bar class="progress-bar" mode="determinate" [value]="PROGRESS"></mat-progress-bar>
 
+  <div class="puzzle-wrapper">
   <div class="puzzle-container"
        [style.--rows]="PUZZLE.grid.length"
        [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">
@@ -50,5 +51,6 @@
         }
       }
     </div>
+  </div>
   </div>
 }

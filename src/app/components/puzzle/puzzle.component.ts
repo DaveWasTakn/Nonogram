@@ -4,6 +4,7 @@ import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
 import {ConfettiService} from '../../services/confettiService/confetti-service';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-puzzle',
@@ -26,8 +27,13 @@ export class PuzzleComponent {
   protected readonly CELL_STATE = CELL_STATE;
   private currentMouseDownCell: number[] | undefined = undefined;
   private currentMouseOverCells: number[][] = [];
+  private IS_MOBILE: boolean = false;
 
-  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService) {
+  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver) {
+    this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
+      this.IS_MOBILE = result.matches;
+    });
+
     effect(() => {
       const settings: PuzzleSettings | undefined = this.puzzleService.puzzleSettingsSignal();
       if (settings) {
@@ -162,7 +168,7 @@ export class PuzzleComponent {
     const verticalCellSize = (window.innerHeight - 120 - 2 * verticalItems) / verticalItems;
 
     const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
-    const horizontalCellSize = (window.innerWidth - 100 - 2 * horizontalItems) / horizontalItems;
+    const horizontalCellSize = (window.innerWidth - 2 * horizontalItems) / horizontalItems;
 
     const cellSize = Math.min(verticalCellSize, horizontalCellSize, 30);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
