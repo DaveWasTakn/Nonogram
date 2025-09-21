@@ -1,13 +1,18 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .puzzle-wrapper {
   flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
 }
-
-.puzzle-wrapper { background: rgba(0,255,0,0.08); }
-.puzzle-container { background: rgba(0,0,255,0.03); }
 
 .puzzle-container,
 .puzzle-container * {
@@ -22,7 +27,7 @@
     "row-hints puzzle";
   justify-content: center;
   align-items: start;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -39,11 +44,9 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
-    width: 100%;
   }
 
   .hint-num {
-    width: 100%;
     height: var(--cell-size);
     display: flex;
     justify-content: center;
@@ -121,10 +124,13 @@
 }
 
 .prevent-select {
-  -webkit-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
 @media (max-width: 600px) {
+
+  .puzzle-grid, .row-hints, .col-hints {
+    gap: unset;
+  }
+
 }

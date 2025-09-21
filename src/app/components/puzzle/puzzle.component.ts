@@ -165,10 +165,16 @@ export class PuzzleComponent {
 
   private updateCellSize() {
     let verticalItems = this.PUZZLE!.sizeRows + Math.max(...this.PUZZLE!.colNums.map(x => x.length));
-    const verticalCellSize = (window.innerHeight - 120 - 2 * verticalItems) / verticalItems;
-
     const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
-    const horizontalCellSize = (window.innerWidth - 2 * horizontalItems) / horizontalItems;
+
+    let cellGap = 2;
+
+    if (this.IS_MOBILE) {
+      cellGap = 0;
+    }
+
+    const verticalCellSize = (window.innerHeight - 120 - cellGap * verticalItems) / verticalItems;
+    const horizontalCellSize = (window.innerWidth - 10 - cellGap * horizontalItems) / horizontalItems;
 
     const cellSize = Math.min(verticalCellSize, horizontalCellSize, 30);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
