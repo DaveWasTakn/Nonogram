@@ -12,6 +12,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .puzzle-container,
@@ -137,6 +138,7 @@
     display: inline-flex;
     width: fit-content;
     align-self: center;
+    margin-top: 2rem;
   }
 
   .puzzle-grid, .row-hints, .col-hints {

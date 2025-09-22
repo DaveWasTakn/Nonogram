@@ -1,12 +1,13 @@
 import {Component, effect, HostListener} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
-import {Cell, CELL_STATE, Puzzle} from '../../shared/shared';
+import {Cell, CELL_STATE, DIRECTION, Pos, Puzzle} from '../../shared/shared';
 import {NgClass} from '@angular/common';
 import {ConfettiService} from '../../services/confettiService/confetti-service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {BreakpointObserver} from '@angular/cdk/layout';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {FormsModule} from '@angular/forms';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-puzzle',
@@ -14,7 +15,8 @@ import {FormsModule} from '@angular/forms';
     NgClass,
     MatProgressBar,
     MatButtonToggleModule,
-    FormsModule
+    FormsModule,
+    MatIcon
   ],
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.scss'
@@ -30,9 +32,14 @@ export class PuzzleComponent {
   TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
 
   protected readonly CELL_STATE = CELL_STATE;
-  private currentMouseDownCell: number[] | undefined = undefined;
-  private currentMouseOverCells: number[][] = [];
+  private currentMouseDownCell: Pos | undefined;
+  private currentMouseOverCells: Pos[] = [];
   private IS_MOBILE: boolean = false;
+  private TOUCH_initial_cell: Pos | undefined;
+  private TOUCH_changed_cells: Pos[] = [];
+  private TOUCH_fill_mode: CELL_STATE | undefined;
+  private TOUCH_initial_cell_state: CELL_STATE | undefined;
+  private TOUCH_DIRECTION: DIRECTION | undefined;
 
   constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver) {
     this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
@@ -113,20 +120,20 @@ export class PuzzleComponent {
   }
 
   onMouseDown(row: number, col: number, event: MouseEvent) {
-    this.currentMouseDownCell = [row, col];
+    this.currentMouseDownCell = new Pos(row, col);
   }
 
   onMouseUp(row: number, col: number, event: MouseEvent) {
     if (
       event.button === 0
-      && this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col
-      && (this.currentMouseOverCells.length === 0 || !(this.currentMouseOverCells[0][0] === row && this.currentMouseOverCells[0][1] === col))
+      && this.currentMouseDownCell && this.currentMouseDownCell.row === row && this.currentMouseDownCell.col === col
+      && (this.currentMouseOverCells.length === 0 || !(this.currentMouseOverCells[0].row === row && this.currentMouseOverCells[0].col === col))
     ) {
       this.GRID[row][col].state = (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2);
       this.onCellUpdate(row, col);
     }
 
-    if (this.currentMouseDownCell && this.currentMouseDownCell[0] === row && this.currentMouseDownCell[1] === col && this.currentMouseOverCells.length <= 1) {
+    if (this.currentMouseDownCell && this.currentMouseDownCell.row === row && this.currentMouseDownCell.col === col && this.currentMouseOverCells.length <= 1) {
       if (event.button === 2) {
         this.GRID[row][col].state = CELL_STATE.EMPTY;
         this.onCellUpdate(row, col);
@@ -139,33 +146,71 @@ export class PuzzleComponent {
 
   onMouseOver(row: number, col: number, event: MouseEvent) {
     if (this.MB_left) {
-      this.currentMouseOverCells.push([row, col]);
+      this.currentMouseOverCells.push(new Pos(row, col));
       this.GRID[row][col].state = CELL_STATE.FILLED;
       this.onCellUpdate(row, col);
     } else if (this.MB_right) {
-      this.currentMouseOverCells.push([row, col]);
+      this.currentMouseOverCells.push(new Pos(row, col));
       this.GRID[row][col].state = CELL_STATE.EMPTY;
       this.onCellUpdate(row, col);
     } else if (this.MB_middle) {
       this.GRID[row][col].state = CELL_STATE.UNKNOWN;
       this.onCellUpdate(row, col);
-      this.currentMouseOverCells.push([row, col]);
+      this.currentMouseOverCells.push(new Pos(row, col));
+    }
+  }
+
+  onTouchStart(event: TouchEvent) {
+    const pos: Pos | undefined = this.determineCellFromTouch(event);
+    if (pos) {
+      this.TOUCH_initial_cell = pos;
+      this.TOUCH_initial_cell_state = this.GRID[pos.row][pos.col].state;
+      // this.TOUCH_fill_mode = this.TOUCH_initial_cell_state === this.TOUCH_MODE ? CELL_STATE.EMPTY : this.TOUCH_MODE;
+      this.onTouchMove(event);
     }
   }
 
   onTouchMove(event: TouchEvent) {
     event.preventDefault(); // stop scrolling
+    const pos: Pos | undefined = this.determineCellFromTouch(event);
+    if (pos && !this.TOUCH_changed_cells.some(p => p.row === pos.row && p.col === pos.col)) {
+      if (this.TOUCH_changed_cells.length >= 1 && this.TOUCH_DIRECTION === undefined) {
+        const rowDiff = Math.abs(this.TOUCH_initial_cell!.row - pos.row);
+        const colDiff = Math.abs(this.TOUCH_initial_cell!.col - pos.col);
+        this.TOUCH_DIRECTION = rowDiff > colDiff ? DIRECTION.HORIZONTAL : DIRECTION.VERTICAL;
+      }
+      if (this.TOUCH_DIRECTION === DIRECTION.HORIZONTAL) {
+        pos.col = this.TOUCH_initial_cell!.col;
+      } else if (this.TOUCH_DIRECTION === DIRECTION.VERTICAL) {
+        pos.row = this.TOUCH_initial_cell!.row;
+      }
+      const cell = this.GRID[pos.row][pos.col];
+      if (cell.state === this.TOUCH_initial_cell_state) {
+        cell.state = cell.state !== this.TOUCH_MODE ? this.TOUCH_MODE : CELL_STATE.UNKNOWN;
+        this.TOUCH_changed_cells.push(pos);
+        this.onCellUpdate(pos.row, pos.col);
+      }
+    }
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    this.TOUCH_changed_cells = [];
+    this.TOUCH_initial_cell = undefined;
+    this.TOUCH_initial_cell_state = undefined;
+    this.TOUCH_DIRECTION = undefined;
+  }
+
+  private determineCellFromTouch(event: TouchEvent): Pos | undefined {
     const touch = event.touches[0];
     const target: Element | null = document.elementFromPoint(touch.clientX, touch.clientY);
 
     if (target && target.classList.contains('cell')) {
       const row: string | null = target.getAttribute('data-row');
       const col: string | null = target.getAttribute('data-col');
-      if (row !== null && col !== null) {
-      this.GRID[+row][+col].state = this.TOUCH_MODE;
-        this.onCellUpdate(+row, +col);
-      }
+      return row !== null && col !== null ? new Pos(+row, +col) : undefined;
     }
+
+    return undefined;
   }
 
   private updateCellSize() {

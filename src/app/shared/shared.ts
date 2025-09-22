@@ -16,6 +16,16 @@ export enum CELL_STATE {
   FILLED = 2,
 }
 
+export enum DIRECTION {
+  HORIZONTAL = 0,
+  VERTICAL = 1,
+}
+
+export class Pos{
+  constructor(public row: number, public col: number) {
+  }
+}
+
 export class Cell {  // box CellState into an object to have row- and column- view in sync
   constructor(public state: CELL_STATE) {
   }
