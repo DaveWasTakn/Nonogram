@@ -3,7 +3,8 @@ An Angular application that lets you play and solve Nonogram (Picross) puzzles.
 
 Hosted at: https://nonogram.pfliegler.at/
 
-<img src="public/preview.png"></img>
+<img src="public/puzzle_empty.png"></img>
+<img src="public/puzzle_solved.png"></img>
 
 ## TODOs
 - Confirmation dialogue when starting a new game if the current game is edited
