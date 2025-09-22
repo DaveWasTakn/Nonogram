@@ -6,7 +6,7 @@
   }
 
   <div class="settings">
-    <mat-form-field class="select size">
+    <mat-form-field appearance="outline" class="select size">
       <mat-label>Size</mat-label>
       <mat-select [(ngModel)]="SIZE">
         @for (size of SIZES; track size) {
@@ -15,7 +15,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="select difficulty">
+    <mat-form-field appearance="outline" class="select difficulty">
       <mat-label>Difficulty</mat-label>
       <mat-select [(ngModel)]="DIFFICULTY">
         @for (difficulty of DIFFICULTIES; track difficulty) {

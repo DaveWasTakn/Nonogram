@@ -37,7 +37,6 @@ export class PuzzleComponent {
   private IS_MOBILE: boolean = false;
   private TOUCH_initial_cell: Pos | undefined;
   private TOUCH_changed_cells: Pos[] = [];
-  private TOUCH_fill_mode: CELL_STATE | undefined;
   private TOUCH_initial_cell_state: CELL_STATE | undefined;
   private TOUCH_DIRECTION: DIRECTION | undefined;
 
@@ -165,7 +164,6 @@ export class PuzzleComponent {
     if (pos) {
       this.TOUCH_initial_cell = pos;
       this.TOUCH_initial_cell_state = this.GRID[pos.row][pos.col].state;
-      // this.TOUCH_fill_mode = this.TOUCH_initial_cell_state === this.TOUCH_MODE ? CELL_STATE.EMPTY : this.TOUCH_MODE;
       this.onTouchMove(event);
     }
   }
