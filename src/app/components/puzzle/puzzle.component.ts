@@ -8,6 +8,7 @@ import {BreakpointObserver} from '@angular/cdk/layout';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-puzzle',
@@ -16,7 +17,8 @@ import {MatIcon} from '@angular/material/icon';
     MatProgressBar,
     MatButtonToggleModule,
     FormsModule,
-    MatIcon
+    MatIcon,
+    MatIconButton
   ],
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.scss'
@@ -33,6 +35,7 @@ export class PuzzleComponent implements OnInit {
   COMPLETED_COLS: boolean[] = [];
 
   HISTORY: STATE[] = [];
+  FUTURE: STATE[] = [];
 
   TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
 
@@ -57,19 +60,21 @@ export class PuzzleComponent implements OnInit {
     });
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   MB_left: boolean = false;
   MB_middle: boolean = false;
   MB_right: boolean = false;
 
   @HostListener('document:mousedown', ['$event'])
-  onMouseDownGlobal(event: MouseEvent) {
+  onMouseDownListener(event: MouseEvent): void {
     if (event.button === 0) this.MB_left = true;
     if (event.button === 1) this.MB_middle = true;
     if (event.button === 2) this.MB_right = true;
   }
 
   @HostListener('document:mouseup', ['$event'])
-  onMouseUpGlobal(event: MouseEvent) {
+  onMouseUpListener(event: MouseEvent): void {
     if (event.button === 0) this.MB_left = false;
     if (event.button === 1) this.MB_middle = false;
     if (event.button === 2) this.MB_right = false;
@@ -78,17 +83,33 @@ export class PuzzleComponent implements OnInit {
   }
 
   @HostListener('document:contextmenu', ['$event'])
-  onRightClickGlobal(event: MouseEvent) {
+  onRightClickListener(event: MouseEvent): void {
     event.preventDefault();
   }
 
   @HostListener('window:resize')
-  onResizeGlobal() {
+  onResizeListener(): void {
     if (this.PUZZLE) {
       this.updateCellSize();
     }
   }
 
+  @HostListener('window:orientationchange')
+  onOrientationChangeListener(): void {
+    this.onResizeListener()
+  }
+
+  @HostListener('window:keydown.control.z', ['$event'])
+  onKeyDownCtrlZListener(event: Event): void {
+    this.onUndo();
+  }
+
+  @HostListener('window:keydown.control.y', ['$event'])
+  onKeyDownCtrlYListener(event: Event): void {
+    this.onRedo();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ngOnInit(): void {
     const state = this.getLocalStorageState();
     if (state) {
@@ -104,16 +125,11 @@ export class PuzzleComponent implements OnInit {
     this.COMPLETED_ROWS = new Array(this.PUZZLE.sizeRows).fill(false);
     this.COMPLETED_COLS = new Array(this.PUZZLE.sizeCols).fill(false);
     this.PROGRESS = 0;
+    this.HISTORY = [];
+    this.FUTURE = [];
   }
 
-  onCellUpdate(row: number, col: number): void {
-    this.updateCompletedRows(row);
-    this.updateCompletedCols(col);
-    this.updateSolvedStatus();
-    this.updateProgress();
-    this.saveState();
-  }
-
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   updateCompletedRows(row: number): void {
     const currBlocks_rows: number[] = this.puzzleService.countBlocks(this.GRID[row]);
     this.COMPLETED_ROWS[row] = this.PUZZLE!.rowNums[row].toString() === currBlocks_rows.toString();
@@ -136,48 +152,42 @@ export class PuzzleComponent implements OnInit {
     this.PROGRESS = Math.round((PuzzleService.countFilledFields(this.GRID) / this.PUZZLE!.totalFilledCells) * 100);
   }
 
-  onMouseDown(row: number, col: number, event: MouseEvent) {
+  onMouseDown(row: number, col: number, event: MouseEvent): void {
     this.currentMouseDownCell = new Pos(row, col);
   }
 
-  onMouseUp(row: number, col: number, event: MouseEvent) {
+  onMouseUp(row: number, col: number, event: MouseEvent): void {
     if (
       event.button === 0
       && this.currentMouseDownCell && this.currentMouseDownCell.row === row && this.currentMouseDownCell.col === col
       && (this.currentMouseOverCells.length === 0 || !(this.currentMouseOverCells[0].row === row && this.currentMouseOverCells[0].col === col))
     ) {
-      this.GRID[row][col].state = (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2);
-      this.onCellUpdate(row, col);
+      this.cg(row, col, (this.GRID[row][col].state + 2) % (Object.keys(CELL_STATE).length / 2));
     }
 
     if (this.currentMouseDownCell && this.currentMouseDownCell.row === row && this.currentMouseDownCell.col === col && this.currentMouseOverCells.length <= 1) {
       if (event.button === 2) {
-        this.GRID[row][col].state = CELL_STATE.EMPTY;
-        this.onCellUpdate(row, col);
+        this.cg(row, col, CELL_STATE.EMPTY);
       } else if (event.button === 1) {
-        this.GRID[row][col].state = CELL_STATE.UNKNOWN;
-        this.onCellUpdate(row, col);
+        this.cg(row, col, CELL_STATE.UNKNOWN);
       }
     }
   }
 
-  onMouseOver(row: number, col: number, event: MouseEvent) {
+  onMouseOver(row: number, col: number, event: MouseEvent): void {
     if (this.MB_left) {
       this.currentMouseOverCells.push(new Pos(row, col));
-      this.GRID[row][col].state = CELL_STATE.FILLED;
-      this.onCellUpdate(row, col);
+      this.cg(row, col, CELL_STATE.FILLED);
     } else if (this.MB_right) {
       this.currentMouseOverCells.push(new Pos(row, col));
-      this.GRID[row][col].state = CELL_STATE.EMPTY;
-      this.onCellUpdate(row, col);
+      this.cg(row, col, CELL_STATE.EMPTY);
     } else if (this.MB_middle) {
-      this.GRID[row][col].state = CELL_STATE.UNKNOWN;
-      this.onCellUpdate(row, col);
+      this.cg(row, col, CELL_STATE.UNKNOWN);
       this.currentMouseOverCells.push(new Pos(row, col));
     }
   }
 
-  onTouchStart(event: TouchEvent) {
+  onTouchStart(event: TouchEvent): void {
     const pos: Pos | undefined = this.determineCellFromTouch(event);
     if (pos) {
       this.TOUCH_initial_cell = pos;
@@ -186,7 +196,7 @@ export class PuzzleComponent implements OnInit {
     }
   }
 
-  onTouchMove(event: TouchEvent) {
+  onTouchMove(event: TouchEvent): void {
     event.preventDefault(); // stop scrolling
     const pos: Pos | undefined = this.determineCellFromTouch(event);
     if (pos && !this.TOUCH_changed_cells.some(p => p.row === pos.row && p.col === pos.col)) {
@@ -202,14 +212,13 @@ export class PuzzleComponent implements OnInit {
       }
       const cell = this.GRID[pos.row][pos.col];
       if (cell.state === this.TOUCH_initial_cell_state) {
-        cell.state = cell.state !== this.TOUCH_MODE ? this.TOUCH_MODE : CELL_STATE.UNKNOWN;
+        this.cg(pos.row, pos.col, cell.state !== this.TOUCH_MODE ? this.TOUCH_MODE : CELL_STATE.UNKNOWN);
         this.TOUCH_changed_cells.push(pos);
-        this.onCellUpdate(pos.row, pos.col);
       }
     }
   }
 
-  onTouchEnd(event: TouchEvent) {
+  onTouchEnd(event: TouchEvent): void {
     this.TOUCH_changed_cells = [];
     this.TOUCH_initial_cell = undefined;
     this.TOUCH_initial_cell_state = undefined;
@@ -229,7 +238,7 @@ export class PuzzleComponent implements OnInit {
     return undefined;
   }
 
-  private updateCellSize() {
+  private updateCellSize(): void {
     let verticalItems = this.PUZZLE!.sizeRows + Math.max(...this.PUZZLE!.colNums.map(x => x.length));
     const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
 
@@ -246,12 +255,31 @@ export class PuzzleComponent implements OnInit {
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
   }
 
-  onTouchModeToggle() {
+  onTouchModeToggle(): void {
     this.TOUCH_MODE = this.TOUCH_MODE === CELL_STATE.FILLED ? CELL_STATE.EMPTY : CELL_STATE.FILLED;
   }
 
-  saveState() {
-    const state = new STATE(this.PUZZLE, this.GRID);
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // wrapper for changing grid cells
+  private cg(row: number, col: number, state: CELL_STATE): void {
+    if (state !== this.GRID[row][col].state) {
+      this.GRID[row][col].state = state;
+      this.onCellUpdate(row, col);
+    }
+  }
+
+  onCellUpdate(row: number, col: number): void {
+    this.FUTURE = [];
+    this.updateCompletedRows(row);
+    this.updateCompletedCols(col);
+    this.updateSolvedStatus();
+    this.updateProgress();
+    this.saveState();
+  }
+
+  saveState(): void {
+    const state = new STATE(structuredClone(this.PUZZLE), structuredClone(this.GRID));
     this.HISTORY.push(state);
     localStorage.setItem('state', STATE.serialize(state));
   }
@@ -261,7 +289,7 @@ export class PuzzleComponent implements OnInit {
     return state !== null ? STATE.deserialize(state) : undefined;
   }
 
-  loadState(state: STATE) {
+  loadState(state: STATE, keepHistory: boolean = false): void {
     this.PUZZLE = state.PUZZLE;
     this.GRID = state.GRID;
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
@@ -269,8 +297,33 @@ export class PuzzleComponent implements OnInit {
     this.COMPLETED_COLS = new Array(this.PUZZLE!.sizeCols).fill(false);
     [...Array(this.PUZZLE!.sizeRows).keys()].forEach(row => this.updateCompletedRows(row));
     [...Array(this.PUZZLE!.sizeCols).keys()].forEach(col => this.updateCompletedCols(col));
+    if (!keepHistory) {
+      this.HISTORY = [];
+      this.FUTURE = [];
+    }
+    this.saveState();
     this.updateSolvedStatus();
     this.updateProgress();
     this.updateCellSize()
+  }
+
+  onUndo(): void {
+    if (this.HISTORY.length > 1) {
+      const currState = this.HISTORY.pop();
+      const prevState = this.HISTORY.pop();
+      if (currState !== undefined && prevState !== undefined) {
+        this.loadState(prevState, true);
+        this.FUTURE.push(currState);
+      }
+    }
+  }
+
+  onRedo(): void {
+    if (this.FUTURE.length > 0) {
+      const nextState = this.FUTURE.pop();
+      if (nextState !== undefined) {
+        this.loadState(nextState, true);
+      }
+    }
   }
 }

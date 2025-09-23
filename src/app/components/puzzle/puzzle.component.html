@@ -3,6 +3,15 @@
   <mat-progress-bar class="progress-bar" mode="determinate" [value]="PROGRESS"></mat-progress-bar>
 
   <div class="puzzle-wrapper">
+    <div class="undo-redo-container">
+      <button mat-icon-button class="undo-redo-button" (click)="onUndo()" [disabled]="HISTORY.length <= 1">
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button mat-icon-button class="undo-redo-button" (click)="onRedo()" [disabled]="FUTURE.length === 0">
+        <mat-icon>redo</mat-icon>
+      </button>
+    </div>
+
     <div class="puzzle-container"
          [style.--rows]="PUZZLE.grid.length"
          [style.--cols]="PUZZLE.grid.length > 0 ? PUZZLE.grid[0].length : 0">

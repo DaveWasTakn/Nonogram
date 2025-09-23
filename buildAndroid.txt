@@ -1,0 +1,6 @@
+cd C:/Data/projects/nonogram
+ng build
+npx cap sync
+npx cap copy
+cd android
+.\gradlew.bat assembleDebug
