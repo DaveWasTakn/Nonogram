@@ -1,6 +1,6 @@
-import {Component, effect, HostListener} from '@angular/core';
+import {Component, effect, HostListener, OnInit} from '@angular/core';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
-import {Cell, CELL_STATE, DIRECTION, Pos, Puzzle} from '../../shared/shared';
+import {Cell, CELL_STATE, DIRECTION, Pos, Puzzle, STATE} from '../../shared/shared';
 import {NgClass} from '@angular/common';
 import {ConfettiService} from '../../services/confettiService/confetti-service';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -21,17 +21,21 @@ import {MatIcon} from '@angular/material/icon';
   templateUrl: './puzzle.component.html',
   styleUrl: './puzzle.component.scss'
 })
-export class PuzzleComponent {
+export class PuzzleComponent implements OnInit {
+  protected readonly CELL_STATE = CELL_STATE;
+
   GRID: Cell[][] = [];
   GRID_COLUMNS: Cell[][] = [];
   SOLVED: boolean = false;
   PROGRESS: number = 0;
   PUZZLE: Puzzle | undefined;
-  rowIsCompleted: boolean[] = [];
-  colIsCompleted: boolean[] = [];
+  COMPLETED_ROWS: boolean[] = [];
+  COMPLETED_COLS: boolean[] = [];
+
+  HISTORY: STATE[] = [];
+
   TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
 
-  protected readonly CELL_STATE = CELL_STATE;
   private currentMouseDownCell: Pos | undefined;
   private currentMouseOverCells: Pos[] = [];
   private IS_MOBILE: boolean = false;
@@ -85,29 +89,43 @@ export class PuzzleComponent {
     }
   }
 
+  ngOnInit(): void {
+    const state = this.getLocalStorageState();
+    if (state) {
+      this.loadState(state);
+    }
+  }
+
   start(settings: PuzzleSettings): void {
     this.PUZZLE = this.puzzleService.createPuzzle(settings);
     this.updateCellSize()
     this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
-    this.rowIsCompleted = new Array(this.PUZZLE.sizeRows).fill(false);
-    this.colIsCompleted = new Array(this.PUZZLE.sizeCols).fill(false);
+    this.COMPLETED_ROWS = new Array(this.PUZZLE.sizeRows).fill(false);
+    this.COMPLETED_COLS = new Array(this.PUZZLE.sizeCols).fill(false);
     this.PROGRESS = 0;
   }
 
   onCellUpdate(row: number, col: number): void {
-    const currBlocks_rows: number[] = this.puzzleService.countBlocks(this.GRID[row]);
-    const currBlocks_cols: number[] = this.puzzleService.countBlocks(this.GRID_COLUMNS[col]);
-
-    this.rowIsCompleted[row] = this.PUZZLE!.rowNums[row].toString() === currBlocks_rows.toString();
-    this.colIsCompleted[col] = this.PUZZLE!.colNums[col].toString() === currBlocks_cols.toString();
-
+    this.updateCompletedRows(row);
+    this.updateCompletedCols(col);
     this.updateSolvedStatus();
     this.updateProgress();
+    this.saveState();
+  }
+
+  updateCompletedRows(row: number): void {
+    const currBlocks_rows: number[] = this.puzzleService.countBlocks(this.GRID[row]);
+    this.COMPLETED_ROWS[row] = this.PUZZLE!.rowNums[row].toString() === currBlocks_rows.toString();
+  }
+
+  updateCompletedCols(col: number): void {
+    const currBlocks_cols: number[] = this.puzzleService.countBlocks(this.GRID_COLUMNS[col]);
+    this.COMPLETED_COLS[col] = this.PUZZLE!.colNums[col].toString() === currBlocks_cols.toString();
   }
 
   updateSolvedStatus(): void {
-    const newSolvedStatus = this.rowIsCompleted.every(x => x) && this.colIsCompleted.every(x => x)
+    const newSolvedStatus = this.COMPLETED_ROWS.every(x => x) && this.COMPLETED_COLS.every(x => x)
     if (newSolvedStatus && !this.SOLVED) {
       this.confettiService.celebrate();
     }
@@ -230,7 +248,29 @@ export class PuzzleComponent {
 
   onTouchModeToggle() {
     this.TOUCH_MODE = this.TOUCH_MODE === CELL_STATE.FILLED ? CELL_STATE.EMPTY : CELL_STATE.FILLED;
+  }
 
-    console.log('TOUCH_MODE is now:', this.TOUCH_MODE);
+  saveState() {
+    const state = new STATE(this.PUZZLE, this.GRID);
+    this.HISTORY.push(state);
+    localStorage.setItem('state', STATE.serialize(state));
+  }
+
+  getLocalStorageState(): STATE | undefined {
+    const state = localStorage.getItem('state');
+    return state !== null ? STATE.deserialize(state) : undefined;
+  }
+
+  loadState(state: STATE) {
+    this.PUZZLE = state.PUZZLE;
+    this.GRID = state.GRID;
+    this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
+    this.COMPLETED_ROWS = new Array(this.PUZZLE!.sizeRows).fill(false);
+    this.COMPLETED_COLS = new Array(this.PUZZLE!.sizeCols).fill(false);
+    [...Array(this.PUZZLE!.sizeRows).keys()].forEach(row => this.updateCompletedRows(row));
+    [...Array(this.PUZZLE!.sizeCols).keys()].forEach(col => this.updateCompletedCols(col));
+    this.updateSolvedStatus();
+    this.updateProgress();
+    this.updateCellSize()
   }
 }

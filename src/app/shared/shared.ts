@@ -21,7 +21,7 @@ export enum DIRECTION {
   VERTICAL = 1,
 }
 
-export class Pos{
+export class Pos {
   constructor(public row: number, public col: number) {
   }
 }
@@ -43,4 +43,21 @@ export class Puzzle {
     public totalFilledCells: number
   ) {
   }
+}
+
+export class STATE {
+  constructor(
+    public PUZZLE: Puzzle | undefined,
+    public GRID: Cell[][]
+  ) {
+  }
+
+  public static serialize(state: STATE): string {
+    return JSON.stringify(state);
+  }
+
+  public static deserialize(stateStr: string): STATE {
+    return JSON.parse(stateStr) as STATE;
+  }
+
 }
