@@ -1,13 +1,13 @@
-export enum DIFFICULTIES {
+export enum DIFFICULTY {
   EASY = "Easy",
   MEDIUM = "Medium",
   HARD = "Hard"
 }
 
-export const DIFFICULTY_PERCENTAGE: Record<DIFFICULTIES, number> = {
-  [DIFFICULTIES.EASY]: 65,
-  [DIFFICULTIES.MEDIUM]: 50,
-  [DIFFICULTIES.HARD]: 35
+export const DIFFICULTY_PERCENTAGE: Record<DIFFICULTY, number> = {
+  [DIFFICULTY.EASY]: 65,
+  [DIFFICULTY.MEDIUM]: 50,
+  [DIFFICULTY.HARD]: 35
 };
 
 export enum CELL_STATE {
@@ -35,7 +35,7 @@ export class Puzzle {
   constructor(
     public sizeRows: number,
     public sizeCols: number,
-    public difficulty: DIFFICULTIES,
+    public difficulty: DIFFICULTY,
     public grid: Cell[][],
     public grid_columnView: Cell[][],
     public rowNums: number[][],

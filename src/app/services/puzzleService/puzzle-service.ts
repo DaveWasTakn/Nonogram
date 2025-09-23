@@ -1,10 +1,10 @@
 import {Injectable, signal} from '@angular/core';
 
-import {Cell, CELL_STATE, DIFFICULTIES, DIFFICULTY_PERCENTAGE, Puzzle} from '../../shared/shared';
+import {Cell, CELL_STATE, DIFFICULTY, DIFFICULTY_PERCENTAGE, Puzzle} from '../../shared/shared';
 
 export interface PuzzleSettings {
   size: number;
-  difficulty: DIFFICULTIES;
+  difficulty: DIFFICULTY;
 }
 
 @Injectable({
@@ -31,6 +31,9 @@ export class PuzzleService {
     grid.forEach(this.ensureAtLeastOneFilled);
     cols.forEach(this.ensureAtLeastOneFilled);
 
+    grid.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
+    cols.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
+
     // TODO check solvability ...
 
     const rowNums = grid.map(this.countBlocks);
@@ -50,6 +53,29 @@ export class PuzzleService {
     }
   }
 
+  enforceMaxContiguousBlocks(arr: Cell[], difficulty: DIFFICULTY): void {  // TODO filling needs to be called in a loop ig; bcs eg. filling blanks for one row can introduce another block for a column
+    const difficultyBlocksLength = difficulty === DIFFICULTY.EASY ? 0 : difficulty === DIFFICULTY.MEDIUM ? 1 : 2;
+    let blocks = this.countBlocks(arr);
+    let diff = blocks.length - (Math.floor(arr.length / 5) + difficultyBlocksLength);
+    let skip = true;
+    let emptyIndices = arr.map((cell, i) => {
+      if (skip) {
+        if (cell.state === CELL_STATE.FILLED) {
+          skip = false;
+        }
+        return undefined;
+      }
+      return cell.state === CELL_STATE.EMPTY ? i : undefined
+    }).filter(x => x !== undefined);
+
+    while (diff > 0) {
+      arr[emptyIndices[0]].state = CELL_STATE.FILLED;
+
+      blocks = this.countBlocks(arr);
+      diff = blocks.length - (Math.floor(arr.length / 5) + difficultyBlocksLength);
+      emptyIndices = emptyIndices.slice(1);
+    }
+  }
 
   countBlocks(arr: Cell[]): number[] {
     const nums: number[] = [];

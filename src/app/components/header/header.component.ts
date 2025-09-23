@@ -4,7 +4,7 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
-import {DIFFICULTIES} from '../../shared/shared';
+import {DIFFICULTY} from '../../shared/shared';
 import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Component({
@@ -28,8 +28,8 @@ export class HeaderComponent {
   SIZE = 15;
   SIZES: number[] = [5, 10, 15, 20, 25, 30, 40];
 
-  DIFFICULTY: DIFFICULTIES = DIFFICULTIES.EASY;
-  DIFFICULTIES = Object.values(DIFFICULTIES);
+  DIFFICULTY: DIFFICULTY = DIFFICULTY.EASY;
+  DIFFICULTIES = Object.values(DIFFICULTY);
   IS_MOBILE: boolean = false;
 
   constructor(private puzzleService: PuzzleService, private breakpointObserver: BreakpointObserver) {
