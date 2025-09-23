@@ -55,14 +55,11 @@
       </div>
     </div>
 
-    <mat-button-toggle-group [(ngModel)]="TOUCH_MODE" class="touch-mode-toggle" appearance="standard">
-      <mat-button-toggle [value]="CELL_STATE.FILLED">
-        <mat-icon>square</mat-icon>
+    <div class="touch-mode-toggle">
+      <mat-button-toggle class="touch-mode-toggle-button" (click)="onTouchModeToggle()">
+        <mat-icon>{{ TOUCH_MODE === CELL_STATE.FILLED ? 'square' : 'close' }}</mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle [value]="CELL_STATE.EMPTY">
-        <mat-icon>close</mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+    </div>
 
   </div>
 

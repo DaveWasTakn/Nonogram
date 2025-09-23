@@ -227,4 +227,10 @@ export class PuzzleComponent {
     const cellSize = Math.min(verticalCellSize, horizontalCellSize, 30);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
   }
+
+  onTouchModeToggle() {
+    this.TOUCH_MODE = this.TOUCH_MODE === CELL_STATE.FILLED ? CELL_STATE.EMPTY : CELL_STATE.FILLED;
+
+    console.log('TOUCH_MODE is now:', this.TOUCH_MODE);
+  }
 }

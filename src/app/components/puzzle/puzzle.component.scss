@@ -136,9 +136,17 @@
 
   .touch-mode-toggle {
     display: inline-flex;
-    width: fit-content;
     align-self: center;
     margin-top: 2rem;
+  }
+
+  .touch-mode-toggle-button {
+    width: 10rem;
+  }
+
+  ::ng-deep .mat-button-toggle-checked {
+    background-color: inherit !important;
+    color: inherit !important;
   }
 
   .puzzle-grid, .row-hints, .col-hints {
