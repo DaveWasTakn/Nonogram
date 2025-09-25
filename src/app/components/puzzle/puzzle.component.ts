@@ -38,10 +38,10 @@ export class PuzzleComponent implements OnInit {
   FUTURE: STATE[] = [];
 
   TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
+  IS_MOBILE: boolean = false;
 
   private currentMouseDownCell: Pos | undefined;
   private currentMouseOverCells: Pos[] = [];
-  private IS_MOBILE: boolean = false;
   private TOUCH_initial_cell: Pos | undefined;
   private TOUCH_changed_cells: Pos[] = [];
   private TOUCH_initial_cell_state: CELL_STATE | undefined;
@@ -141,11 +141,43 @@ export class PuzzleComponent implements OnInit {
   }
 
   updateSolvedStatus(): void {
-    const newSolvedStatus = this.COMPLETED_ROWS.every(x => x) && this.COMPLETED_COLS.every(x => x)
-    if (newSolvedStatus && !this.SOLVED) {
+    const currentSolvedStatus = this.COMPLETED_ROWS.every(x => x) && this.COMPLETED_COLS.every(x => x)
+    if (currentSolvedStatus) {
       this.confettiService.celebrate();
+      this.SOLVED = currentSolvedStatus;
+      this.increaseStreak();
     }
-    this.SOLVED = newSolvedStatus;
+  }
+
+  increaseStreak() {
+    let streak: number = this.readStreak();
+    let lastSolvedDate = this.readLastSolvedDate()
+    let dateNow = new Date();
+    if (!lastSolvedDate || (lastSolvedDate.getDate() + 1) === dateNow.getDate()) {
+      streak++;
+    }
+    this.writeStreak(streak);
+    this.writeLastSolvedDate(dateNow);
+  }
+
+  readLastSolvedDate() {
+    const s = localStorage.getItem('lastSolvedDate');
+    if (!s) return null;
+    return new Date(s);
+  }
+
+  writeLastSolvedDate(date: Date) {
+    localStorage.setItem('lastSolvedDate', date.toString());
+  }
+
+  readStreak(): number {
+    const s = localStorage.getItem('streak');
+    if (!s) return 0;
+    return Number(s);
+  }
+
+  writeStreak(streak: number): void {
+    localStorage.setItem('streak', String(streak));
   }
 
   updateProgress(): void {
@@ -302,7 +334,6 @@ export class PuzzleComponent implements OnInit {
       this.FUTURE = [];
     }
     this.saveState();
-    this.updateSolvedStatus();
     this.updateProgress();
     this.updateCellSize()
   }

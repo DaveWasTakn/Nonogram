@@ -42,5 +42,8 @@ export class HeaderComponent {
     this.puzzleService.setPuzzleSettings({size: this.SIZE, difficulty: this.DIFFICULTY} as PuzzleSettings);
   }
 
+  getCurrentStreak() {
+    return localStorage.getItem('streak') || '0';
+  }
 }
 

@@ -3,6 +3,15 @@
   font-weight: bold;
 }
 
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+
+  svg {
+    translate: 0 -2px;
+  }
+}
 
 .toolbar {
   padding: 40px 20px 40px 20px;
