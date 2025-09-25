@@ -111,6 +111,7 @@ export class PuzzleComponent implements OnInit {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ngOnInit(): void {
+    this.checkStreak();
     const state = this.getLocalStorageState();
     if (state) {
       this.loadState(state);
@@ -149,12 +150,34 @@ export class PuzzleComponent implements OnInit {
     }
   }
 
-  increaseStreak() {
-    let streak: number = this.readStreak();
+  checkStreak() {
     let lastSolvedDate = this.readLastSolvedDate()
     let dateNow = new Date();
-    if (!lastSolvedDate || (lastSolvedDate.getDate() + 1) === dateNow.getDate()) {
-      streak++;
+    if (lastSolvedDate && this.diffDays(lastSolvedDate, dateNow) > 1) {
+      this.writeStreak(0);
+    }
+  }
+
+  diffDays(date1: Date, date2: Date) {
+    const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.abs(Math.floor((d2.getTime() - d1.getTime()) / msPerDay));
+  }
+
+  increaseStreak() {
+    let streak: number = this.readStreak();
+    const lastSolvedDate = this.readLastSolvedDate()
+    const dateNow = new Date();
+    if (!lastSolvedDate) {
+      streak = 1;
+    } else {
+      const diff = this.diffDays(lastSolvedDate, dateNow);
+      if (diff > 1) {
+        streak = 1;
+      } else if (diff === 1) {
+        streak++;
+      }
     }
     this.writeStreak(streak);
     this.writeLastSolvedDate(dateNow);
