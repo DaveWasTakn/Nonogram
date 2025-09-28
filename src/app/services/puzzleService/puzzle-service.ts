@@ -31,8 +31,8 @@ export class PuzzleService {
     grid.forEach(this.ensureAtLeastOneFilled);
     cols.forEach(this.ensureAtLeastOneFilled);
 
-    grid.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
-    cols.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
+    // grid.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
+    // cols.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
 
     // TODO check solvability ...
 
