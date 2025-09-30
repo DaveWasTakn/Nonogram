@@ -12,10 +12,15 @@ export interface PuzzleSettings {
 })
 export class PuzzleService {
 
-  puzzleSettingsSignal = signal<PuzzleSettings | undefined>(undefined);
+  public puzzleSettingsSignal = signal<PuzzleSettings | undefined>(undefined);
+  public puzzleSettingsSignal_reverse = signal<PuzzleSettings | undefined>(undefined);
 
   setPuzzleSettings(settings: PuzzleSettings) {
     this.puzzleSettingsSignal.set(settings);
+  }
+
+  setPuzzleSettingsReverse(settings: PuzzleSettings) {
+    this.puzzleSettingsSignal_reverse.set(settings);
   }
 
   createPuzzle(settings: PuzzleSettings): Puzzle {

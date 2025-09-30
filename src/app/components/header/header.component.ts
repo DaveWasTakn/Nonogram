@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectorRef, Component, effect} from '@angular/core';
 import {MatFormField, MatLabel, MatOption, MatSelect} from '@angular/material/select';
 import {MatToolbar} from '@angular/material/toolbar';
 import {FormsModule} from '@angular/forms';
@@ -6,6 +6,7 @@ import {MatButton} from '@angular/material/button';
 import {PuzzleService, PuzzleSettings} from '../../services/puzzle-service';
 import {DIFFICULTY} from '../../shared/classes';
 import {BreakpointObserver} from '@angular/cdk/layout';
+import {StorageService} from '../../services/storage-service';
 
 @Component({
   selector: 'app-header',
@@ -32,9 +33,18 @@ export class HeaderComponent {
   DIFFICULTIES = Object.values(DIFFICULTY);
   IS_MOBILE: boolean = false;
 
-  constructor(private puzzleService: PuzzleService, private breakpointObserver: BreakpointObserver) {
+  constructor(private puzzleService: PuzzleService, private breakpointObserver: BreakpointObserver, private cdr: ChangeDetectorRef) {
     this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
       this.IS_MOBILE = result.matches;
+    });
+
+    effect(() => {
+      const settings: PuzzleSettings | undefined = this.puzzleService.puzzleSettingsSignal_reverse();
+      if (settings) {
+        this.DIFFICULTY = settings.difficulty;
+        this.SIZE = settings.size;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -43,7 +53,7 @@ export class HeaderComponent {
   }
 
   getCurrentStreak() {
-    return localStorage.getItem('streak') || '0';
+    return StorageService.readStreak();
   }
 }
 

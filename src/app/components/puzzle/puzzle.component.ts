@@ -297,6 +297,7 @@ export class PuzzleComponent implements OnInit {
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
     this.COMPLETED_ROWS = new Array(this.PUZZLE!.sizeRows).fill(false);
     this.COMPLETED_COLS = new Array(this.PUZZLE!.sizeCols).fill(false);
+    this.puzzleService.setPuzzleSettingsReverse({size: this.PUZZLE?.sizeRows, difficulty: this.PUZZLE?.difficulty} as PuzzleSettings);
     [...Array(this.PUZZLE!.sizeRows).keys()].forEach(row => this.updateCompletedRows(row));
     [...Array(this.PUZZLE!.sizeCols).keys()].forEach(col => this.updateCompletedCols(col));
     if (!keepHistory) {
