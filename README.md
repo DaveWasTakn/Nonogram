@@ -17,10 +17,11 @@ Hosted at: https://nonogram.pfliegler.at/
   - [ ] Investigate solving-difficulty
 - [ ] Congratulations message on puzzle completion
 - [ ] Statistics
-  - [ ] E.g. Total solved puzzles, daily streak, 
+  - [ ] E.g. Total solved puzzles 
+  - [x] daily streak
 - [ ] Info screen
   - [ ] Game rules and mouse controls
-- [ ] Check Browser Compatability (Safari :^))
+- [ ] Clean up mouse and touch controls (merge common functionality)
 - [x] Mobile version
   - [x] Mobile friendly input and styling
   - [x] Build for mobile devices (with Capacitor? https://capacitorjs.com/)
