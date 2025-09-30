@@ -49,7 +49,7 @@ export class PuzzleService {
   ensureAtLeastOneFilled(arr: Cell[]): void {
     if (!arr.some(cell => cell.state === CELL_STATE.FILLED)) {
       const randomIndex = Math.floor(Math.random() * arr.length);
-      arr[randomIndex] = new Cell(CELL_STATE.FILLED);
+      arr[randomIndex].state = CELL_STATE.FILLED;
     }
   }
 
