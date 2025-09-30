@@ -1,14 +1,16 @@
 import {Component, effect, HostListener, OnInit} from '@angular/core';
-import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
-import {Cell, CELL_STATE, DIRECTION, Pos, Puzzle, STATE} from '../../shared/shared';
+import {PuzzleService, PuzzleSettings} from '../../services/puzzle-service';
+import {Cell, CELL_STATE, DIRECTION, Pos, Puzzle, STATE} from '../../shared/classes';
 import {NgClass} from '@angular/common';
-import {ConfettiService} from '../../services/confettiService/confetti-service';
+import {ConfettiService} from '../../services/confetti-service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {BreakpointObserver} from '@angular/cdk/layout';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
+import {StorageService} from '../../services/storage-service';
+import {determineCellFromTouch, diffDays} from '../../shared/utils';
 
 @Component({
   selector: 'app-puzzle',
@@ -26,19 +28,20 @@ import {MatIconButton} from '@angular/material/button';
 export class PuzzleComponent implements OnInit {
   protected readonly CELL_STATE = CELL_STATE;
 
-  GRID: Cell[][] = [];
-  GRID_COLUMNS: Cell[][] = [];
-  SOLVED: boolean = false;
-  PROGRESS: number = 0;
-  PUZZLE: Puzzle | undefined;
-  COMPLETED_ROWS: boolean[] = [];
-  COMPLETED_COLS: boolean[] = [];
+  protected GRID: Cell[][] = [];
+  protected GRID_COLUMNS: Cell[][] = [];
+  protected SOLVED: boolean = false;
+  protected PROGRESS: number = 0;
+  protected PUZZLE: Puzzle | undefined;
+  protected COMPLETED_ROWS: boolean[] = [];
+  protected COMPLETED_COLS: boolean[] = [];
 
-  HISTORY: STATE[] = [];
-  FUTURE: STATE[] = [];
+  protected HISTORY: STATE[] = [];
+  protected FUTURE: STATE[] = [];
+  private PENDING_CHANGES: boolean = false;
 
-  TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
-  IS_MOBILE: boolean = false;
+  protected TOUCH_MODE: CELL_STATE = CELL_STATE.FILLED;
+  protected IS_MOBILE: boolean = false;
 
   private currentMouseDownCell: Pos | undefined;
   private currentMouseOverCells: Pos[] = [];
@@ -47,7 +50,7 @@ export class PuzzleComponent implements OnInit {
   private TOUCH_initial_cell_state: CELL_STATE | undefined;
   private TOUCH_DIRECTION: DIRECTION | undefined;
 
-  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver) {
+  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver, private storageService: StorageService) {
     this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
       this.IS_MOBILE = result.matches;
     });
@@ -60,11 +63,32 @@ export class PuzzleComponent implements OnInit {
     });
   }
 
+  ngOnInit(): void {
+    this.checkStreak();
+    const state = this.storageService.getLocalStorageState();
+    if (state) {
+      this.loadState(state);
+    }
+  }
+
+  start(settings: PuzzleSettings): void {
+    this.PUZZLE = this.puzzleService.createPuzzle(settings);
+    this.updateCellSize()
+    this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));
+    this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
+    this.COMPLETED_ROWS = new Array(this.PUZZLE.sizeRows).fill(false);
+    this.COMPLETED_COLS = new Array(this.PUZZLE.sizeCols).fill(false);
+    this.PROGRESS = 0;
+    this.HISTORY = [];
+    this.FUTURE = [];
+    this.saveState();
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  MB_left: boolean = false;
-  MB_middle: boolean = false;
-  MB_right: boolean = false;
+  private MB_left: boolean = false;
+  private MB_middle: boolean = false;
+  private MB_right: boolean = false;
 
   @HostListener('document:mousedown', ['$event'])
   onMouseDownListener(event: MouseEvent): void {
@@ -80,6 +104,9 @@ export class PuzzleComponent implements OnInit {
     if (event.button === 2) this.MB_right = false;
     this.currentMouseDownCell = undefined;
     this.currentMouseOverCells = [];
+    if (this.PENDING_CHANGES) {
+      this.saveState();
+    }
   }
 
   @HostListener('document:contextmenu', ['$event'])
@@ -110,27 +137,7 @@ export class PuzzleComponent implements OnInit {
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ngOnInit(): void {
-    this.checkStreak();
-    const state = this.getLocalStorageState();
-    if (state) {
-      this.loadState(state);
-    }
-  }
 
-  start(settings: PuzzleSettings): void {
-    this.PUZZLE = this.puzzleService.createPuzzle(settings);
-    this.updateCellSize()
-    this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));
-    this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
-    this.COMPLETED_ROWS = new Array(this.PUZZLE.sizeRows).fill(false);
-    this.COMPLETED_COLS = new Array(this.PUZZLE.sizeCols).fill(false);
-    this.PROGRESS = 0;
-    this.HISTORY = [];
-    this.FUTURE = [];
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   updateCompletedRows(row: number): void {
     const currBlocks_rows: number[] = this.puzzleService.countBlocks(this.GRID[row]);
     this.COMPLETED_ROWS[row] = this.PUZZLE!.rowNums[row].toString() === currBlocks_rows.toString();
@@ -151,56 +158,29 @@ export class PuzzleComponent implements OnInit {
   }
 
   checkStreak() {
-    let lastSolvedDate = this.readLastSolvedDate()
+    let lastSolvedDate = this.storageService.readLastSolvedDate()
     let dateNow = new Date();
-    if (lastSolvedDate && this.diffDays(lastSolvedDate, dateNow) > 1) {
-      this.writeStreak(0);
+    if (lastSolvedDate && diffDays(lastSolvedDate, dateNow) > 1) {
+      this.storageService.writeStreak(0);
     }
   }
 
-  diffDays(date1: Date, date2: Date) {
-    const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
-    const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
-    const msPerDay = 1000 * 60 * 60 * 24;
-    return Math.abs(Math.floor((d2.getTime() - d1.getTime()) / msPerDay));
-  }
-
   increaseStreak() {
-    let streak: number = this.readStreak();
-    const lastSolvedDate = this.readLastSolvedDate()
+    let streak: number = this.storageService.readStreak();
+    const lastSolvedDate = this.storageService.readLastSolvedDate()
     const dateNow = new Date();
     if (!lastSolvedDate) {
       streak = 1;
     } else {
-      const diff = this.diffDays(lastSolvedDate, dateNow);
+      const diff = diffDays(lastSolvedDate, dateNow);
       if (diff > 1) {
         streak = 1;
       } else if (diff === 1) {
         streak++;
       }
     }
-    this.writeStreak(streak);
-    this.writeLastSolvedDate(dateNow);
-  }
-
-  readLastSolvedDate() {
-    const s = localStorage.getItem('lastSolvedDate');
-    if (!s) return null;
-    return new Date(s);
-  }
-
-  writeLastSolvedDate(date: Date) {
-    localStorage.setItem('lastSolvedDate', date.toString());
-  }
-
-  readStreak(): number {
-    const s = localStorage.getItem('streak');
-    if (!s) return 0;
-    return Number(s);
-  }
-
-  writeStreak(streak: number): void {
-    localStorage.setItem('streak', String(streak));
+    this.storageService.writeStreak(streak);
+    this.storageService.writeLastSolvedDate(dateNow);
   }
 
   updateProgress(): void {
@@ -229,7 +209,7 @@ export class PuzzleComponent implements OnInit {
     }
   }
 
-  onMouseOver(row: number, col: number, event: MouseEvent): void {
+  onMouseMove(row: number, col: number, event: MouseEvent): void {
     if (this.MB_left) {
       this.currentMouseOverCells.push(new Pos(row, col));
       this.cg(row, col, CELL_STATE.FILLED);
@@ -243,7 +223,7 @@ export class PuzzleComponent implements OnInit {
   }
 
   onTouchStart(event: TouchEvent): void {
-    const pos: Pos | undefined = this.determineCellFromTouch(event);
+    const pos: Pos | undefined = determineCellFromTouch(event);
     if (pos) {
       this.TOUCH_initial_cell = pos;
       this.TOUCH_initial_cell_state = this.GRID[pos.row][pos.col].state;
@@ -253,7 +233,7 @@ export class PuzzleComponent implements OnInit {
 
   onTouchMove(event: TouchEvent): void {
     event.preventDefault(); // stop scrolling
-    const pos: Pos | undefined = this.determineCellFromTouch(event);
+    const pos: Pos | undefined = determineCellFromTouch(event);
     if (pos && !this.TOUCH_changed_cells.some(p => p.row === pos.row && p.col === pos.col)) {
       if (this.TOUCH_changed_cells.length >= 1 && this.TOUCH_DIRECTION === undefined) {
         const rowDiff = Math.abs(this.TOUCH_initial_cell!.row - pos.row);
@@ -278,19 +258,9 @@ export class PuzzleComponent implements OnInit {
     this.TOUCH_initial_cell = undefined;
     this.TOUCH_initial_cell_state = undefined;
     this.TOUCH_DIRECTION = undefined;
-  }
-
-  private determineCellFromTouch(event: TouchEvent): Pos | undefined {
-    const touch = event.touches[0];
-    const target: Element | null = document.elementFromPoint(touch.clientX, touch.clientY);
-
-    if (target && target.classList.contains('cell')) {
-      const row: string | null = target.getAttribute('data-row');
-      const col: string | null = target.getAttribute('data-col');
-      return row !== null && col !== null ? new Pos(+row, +col) : undefined;
+    if (this.PENDING_CHANGES) {
+      this.saveState();
     }
-
-    return undefined;
   }
 
   private updateCellSize(): void {
@@ -330,18 +300,14 @@ export class PuzzleComponent implements OnInit {
     this.updateCompletedCols(col);
     this.updateSolvedStatus();
     this.updateProgress();
-    this.saveState();
+    this.PENDING_CHANGES = true;
   }
 
   saveState(): void {
     const state = new STATE(structuredClone(this.PUZZLE), structuredClone(this.GRID));
     this.HISTORY.push(state);
-    localStorage.setItem('state', STATE.serialize(state));
-  }
-
-  getLocalStorageState(): STATE | undefined {
-    const state = localStorage.getItem('state');
-    return state !== null ? STATE.deserialize(state) : undefined;
+    this.PENDING_CHANGES = false;
+    this.storageService.saveState(state);
   }
 
   loadState(state: STATE, keepHistory: boolean = false): void {

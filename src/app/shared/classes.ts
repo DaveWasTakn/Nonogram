@@ -59,5 +59,4 @@ export class STATE {
   public static deserialize(stateStr: string): STATE {
     return JSON.parse(stateStr) as STATE;
   }
-
 }

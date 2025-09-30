@@ -3,8 +3,8 @@ import {MatFormField, MatLabel, MatOption, MatSelect} from '@angular/material/se
 import {MatToolbar} from '@angular/material/toolbar';
 import {FormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
-import {PuzzleService, PuzzleSettings} from '../../services/puzzleService/puzzle-service';
-import {DIFFICULTY} from '../../shared/shared';
+import {PuzzleService, PuzzleSettings} from '../../services/puzzle-service';
+import {DIFFICULTY} from '../../shared/classes';
 import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Component({

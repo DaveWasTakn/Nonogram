@@ -1,6 +1,6 @@
 import {Injectable, signal} from '@angular/core';
 
-import {Cell, CELL_STATE, DIFFICULTY, DIFFICULTY_PERCENTAGE, Puzzle} from '../../shared/shared';
+import {Cell, CELL_STATE, DIFFICULTY, DIFFICULTY_PERCENTAGE, Puzzle} from '../shared/classes';
 
 export interface PuzzleSettings {
   size: number;
@@ -34,7 +34,9 @@ export class PuzzleService {
     // grid.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
     // cols.forEach(x => this.enforceMaxContiguousBlocks(x, settings.difficulty));
 
+    // TODO adjust of enforceMaxContiguousBlocks
     // TODO check solvability ...
+    // TODO check uniqueness ?...
 
     const rowNums = grid.map(this.countBlocks);
     const colNums = cols.map(this.countBlocks);
