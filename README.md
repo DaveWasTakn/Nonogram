@@ -7,7 +7,7 @@ Hosted at: https://nonogram.pfliegler.at/
 <img src="public/puzzle_solved.png"></img>
 
 ## TODOs
-- [ ] Confirmation dialogue when starting a new game if the current game is edited
+- [x] Confirmation dialogue when starting a new game if the current game is edited
 - [ ] **Smarter puzzle creation algorithm**
   - [ ] **Check solvability**
   - [ ] **Investigate solving-difficulty**

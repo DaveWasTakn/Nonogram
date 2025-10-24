@@ -11,6 +11,9 @@ import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {StorageService} from '../../services/storage-service';
 import {checkStreak, determineCellFromTouch, increaseStreak} from '../../shared/utils';
+import {MatDialog} from '@angular/material/dialog';
+import {Dialog} from '../dialog/dialog';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-puzzle',
@@ -51,15 +54,15 @@ export class PuzzleComponent implements OnInit {
   private TOUCH_initial_cell_state: CELL_STATE | undefined;
   private TOUCH_DIRECTION: DIRECTION | undefined;
 
-  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver) {
+  constructor(private puzzleService: PuzzleService, private confettiService: ConfettiService, private breakpointObserver: BreakpointObserver, private dialog: MatDialog) {
     this.breakpointObserver.observe(['(max-width: 600px)']).subscribe(result => {
       this.IS_MOBILE = result.matches;
     });
 
-    effect(() => {
+    effect(async () => {
       const settings: PuzzleSettings | undefined = this.puzzleService.puzzleSettingsSignal();
       if (settings) {
-        this.start(settings);
+        await this.start(settings);
       }
     });
   }
@@ -72,7 +75,24 @@ export class PuzzleComponent implements OnInit {
     }
   }
 
-  start(settings: PuzzleSettings): void {
+  async confirmStart(): Promise<boolean> {
+    if (this.PROGRESS !== 0) {
+      return await firstValueFrom(this.dialog.open(Dialog, {
+        data: {
+          title: "Are you sure to start a new puzzle?",
+          content: "Your progress will be lost.",
+          showButtonOk: true,
+          showButtonCancel: true
+        }
+      }).afterClosed())
+    }
+    return true;
+  }
+
+  async start(settings: PuzzleSettings): Promise<void> {
+    if (!await this.confirmStart()) {
+      return;
+    }
     this.PUZZLE = this.puzzleService.createPuzzle(settings);
     this.updateCellSize()
     this.GRID = new Array(this.PUZZLE.sizeRows).fill(0).map(() => new Array(this.PUZZLE!.sizeCols).fill(0).map(() => new Cell(CELL_STATE.UNKNOWN)));
@@ -297,7 +317,10 @@ export class PuzzleComponent implements OnInit {
     this.GRID_COLUMNS = this.GRID[0].map((_, i) => this.GRID.map(row => row[i]));
     this.COMPLETED_ROWS = new Array(this.PUZZLE!.sizeRows).fill(false);
     this.COMPLETED_COLS = new Array(this.PUZZLE!.sizeCols).fill(false);
-    this.puzzleService.setPuzzleSettingsReverse({size: this.PUZZLE?.sizeRows, difficulty: this.PUZZLE?.difficulty} as PuzzleSettings);
+    this.puzzleService.setPuzzleSettingsReverse({
+      size: this.PUZZLE?.sizeRows,
+      difficulty: this.PUZZLE?.difficulty
+    } as PuzzleSettings);
     [...Array(this.PUZZLE!.sizeRows).keys()].forEach(row => this.updateCompletedRows(row));
     [...Array(this.PUZZLE!.sizeCols).keys()].forEach(col => this.updateCompletedCols(col));
     if (!keepHistory) {
