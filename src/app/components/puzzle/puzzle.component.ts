@@ -263,20 +263,22 @@ export class PuzzleComponent implements OnInit {
   }
 
   private updateCellSize(): void {
-    let verticalItems = this.PUZZLE!.sizeRows + Math.max(...this.PUZZLE!.colNums.map(x => x.length));
-    const horizontalItems = this.PUZZLE!.sizeCols + Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
+    const rows = this.PUZZLE!.sizeRows;
+    const cols = this.PUZZLE!.sizeCols;
+    const maxColNums = Math.max(...this.PUZZLE!.colNums.map(x => x.length));
+    const maxRowNums = Math.max(...this.PUZZLE!.rowNums.map(x => x.length));
 
-    let cellGap = 2;
+    const cellGap = this.IS_MOBILE ? 1 : 2;
+    const hintSizeFac = 0.7;
 
-    if (this.IS_MOBILE) {
-      cellGap = 0;
-    }
-
-    const verticalCellSize = (window.innerHeight - 120 - cellGap * verticalItems) / verticalItems;
-    const horizontalCellSize = (window.innerWidth - 10 - cellGap * horizontalItems) / horizontalItems;
+    // -130 vertically to account for the header
+    const verticalCellSize = (window.innerHeight - 130 - (cellGap * (cols + maxColNums))) / (cols + maxColNums * hintSizeFac);
+    const horizontalCellSize = (window.innerWidth - (cellGap * (rows + maxRowNums))) / (rows + maxRowNums * hintSizeFac);
 
     const cellSize = Math.min(verticalCellSize, horizontalCellSize, 30);
     document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
+    document.documentElement.style.setProperty('--cell-gap', `${cellGap}px`);
+    document.documentElement.style.setProperty('--hint-size', `${hintSizeFac * cellSize}px`);
   }
 
   onTouchModeToggle(): void {

@@ -47,7 +47,7 @@
           <div class="hint-row"
                [ngClass]="{'completed-hint': COMPLETED_ROWS[rowIndex], 'bottom-sep-row-hints': (rowIndex + 1) % 5 == 0 && rowIndex + 1 !== PUZZLE.grid.length}">
             @for (num of rowNums; let i = $index; track i) {
-              <div class="hint-num prevent-select">{{ num }}</div>
+              <div class="hint-num prevent-select" [ngClass]="num >= 10 ? 'hint-num-doubleDigits-row' : ''">{{ num }}</div>
             }
           </div>
         }

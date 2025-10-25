@@ -38,7 +38,7 @@
   grid-template-columns: repeat(var(--cols), var(--cell-size));
   justify-items: stretch;
   align-items: end;
-  gap: 2px;
+  gap: var(--cell-gap);
 
   .hint-col {
     display: flex;
@@ -48,12 +48,13 @@
   }
 
   .hint-num {
-    height: var(--cell-size);
+    height: var(--hint-size);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: calc(0.8 * var(--cell-size));
+    font-size: var(--hint-size);
     border: 1px solid transparent;
+    margin-bottom: 1px;
   }
 }
 
@@ -64,19 +65,19 @@
   grid-template-rows: repeat(var(--rows), var(--cell-size));
   justify-items: end;
   align-items: center;
-  gap: 2px;
+  gap: var(--cell-gap);
 
   .hint-row {
     display: flex;
   }
 
   .hint-num {
-    width: var(--cell-size);
+    width: var(--hint-size);
     height: var(--cell-size);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: calc(0.8 * var(--cell-size));
+    font-size: var(--hint-size);
     border: 1px solid transparent;
   }
 }
@@ -87,7 +88,7 @@
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--cell-size));
   grid-template-rows: repeat(var(--rows), var(--cell-size));
-  gap: 2px;
+  gap: var(--cell-gap);
 }
 
 .cell {
@@ -133,6 +134,10 @@
   }
 }
 
+.hint-num-doubleDigits-row {
+  margin: 0 2px 0 2px;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 .completed-hint {
   background-color: var(--mat-sys-primary-container);
@@ -160,14 +165,10 @@
     color: inherit !important;
   }
 
-  .puzzle-grid, .row-hints, .col-hints {
-    gap: unset;
-  }
-
   .undo-redo-container {
     width: 100%;
     margin-right: 2rem;
-    gap: 0.5rem;
+    gap: 0.8rem;
 
     .undo-redo-button {
       scale: 1.2;
