@@ -17,8 +17,15 @@ Hosted at: https://nonogram.pfliegler.at/
 - [ ] Hint button (i.e. reveal random square)
 - [ ] Congratulations message on puzzle completion
 - [ ] Statistics
-  - [ ] E.g. Total solved puzzles 
-  - [x] daily streak
+  - [x] E.g. Total solved puzzles 
+  - [x] Daily streak
+  - [ ] Time
+    - [ ] Display timer while solving puzzles
+  - In Depth page with more thorough statistics
+    - [ ] Avg Time (per size ?!)
+    - [ ] Best Time (per size ?!)
+    - [ ] Total Time
+    - [ ] Longest Streak
 - [ ] Info screen
   - [ ] Game rules and mouse controls
 - [ ] Clean up mouse and touch controls (merge common functionality)
