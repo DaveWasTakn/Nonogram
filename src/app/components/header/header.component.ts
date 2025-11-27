@@ -7,6 +7,8 @@ import {PuzzleService, PuzzleSettings} from '../../services/puzzle-service';
 import {DIFFICULTY} from '../../shared/classes';
 import {BreakpointObserver} from '@angular/cdk/layout';
 import {StorageService} from '../../services/storage-service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-header',
@@ -20,7 +22,9 @@ import {StorageService} from '../../services/storage-service';
     FormsModule,
     MatFormField,
     MatLabel,
-    MatButton
+    MatButton,
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -52,8 +56,12 @@ export class HeaderComponent {
     this.puzzleService.setPuzzleSettings({size: this.SIZE, difficulty: this.DIFFICULTY} as PuzzleSettings);
   }
 
-  getCurrentStreak() {
+  getCurrentStreak(): number {
     return StorageService.readStreak();
+  }
+
+  getTotalSolved(): number {
+    return StorageService.readTotalSolved();
   }
 }
 

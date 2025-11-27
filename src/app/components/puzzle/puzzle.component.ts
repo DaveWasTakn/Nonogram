@@ -10,7 +10,7 @@ import {FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {StorageService} from '../../services/storage-service';
-import {checkStreak, determineCellFromTouch, increaseStreak} from '../../shared/utils';
+import {checkStreak, determineCellFromTouch, increaseStreak, increaseTotalSolved} from '../../shared/utils';
 import {MatDialog} from '@angular/material/dialog';
 import {Dialog} from '../dialog/dialog';
 import {firstValueFrom} from 'rxjs';
@@ -79,8 +79,8 @@ export class PuzzleComponent implements OnInit {
     if (this.PROGRESS !== 0) {
       return await firstValueFrom(this.dialog.open(Dialog, {
         data: {
-          title: "Are you sure to start a new puzzle?",
-          content: "Your progress will be lost.",
+          title: "Do you want to start a new puzzle?",
+          content: "Your current progress will be lost.",
           showButtonOk: true,
           showButtonCancel: true
         }
@@ -100,6 +100,7 @@ export class PuzzleComponent implements OnInit {
     this.COMPLETED_ROWS = new Array(this.PUZZLE.sizeRows).fill(false);
     this.COMPLETED_COLS = new Array(this.PUZZLE.sizeCols).fill(false);
     this.PROGRESS = 0;
+    this.SOLVED = false;
     this.HISTORY = [];
     this.FUTURE = [];
     this.saveState();
@@ -175,10 +176,11 @@ export class PuzzleComponent implements OnInit {
 
   updateSolvedStatus(): void {
     const currentSolvedStatus = this.COMPLETED_ROWS.every(x => x) && this.COMPLETED_COLS.every(x => x)
-    if (currentSolvedStatus) {
+    if (currentSolvedStatus && !this.SOLVED) {
       this.confettiService.celebrate();
       this.SOLVED = currentSolvedStatus;
       increaseStreak();
+      increaseTotalSolved();
     }
   }
 

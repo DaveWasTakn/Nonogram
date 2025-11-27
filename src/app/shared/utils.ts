@@ -46,3 +46,7 @@ export function increaseStreak() {
   StorageService.writeStreak(streak);
   StorageService.writeLastSolvedDate(dateNow);
 }
+
+export function increaseTotalSolved(): void {
+  StorageService.writeTotalSolved(StorageService.readTotalSolved() + 1);
+}

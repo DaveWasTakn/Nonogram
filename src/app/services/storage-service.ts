@@ -31,6 +31,16 @@ export class StorageService {
     localStorage.setItem('streak', String(streak));
   }
 
+  static readTotalSolved(): number {
+    const s = localStorage.getItem('totalSolved');
+    if (!s) return 0;
+    return Number(s);
+  }
+
+  static writeTotalSolved(totalSolved: number): void {
+    localStorage.setItem('totalSolved', String(totalSolved));
+  }
+
   static saveState(state: STATE): void {
     localStorage.setItem('state', STATE.serialize(state));
   }
